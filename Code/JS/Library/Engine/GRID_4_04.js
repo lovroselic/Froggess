@@ -17,7 +17,7 @@ known bugs:
 */
 
 const GRID = {
-    VERSION: "4.03",
+    VERSION: "4.04",
     CSS: "color: #0AA",
     SETTING: {
         ALLOW_CROSS: false,
@@ -848,10 +848,12 @@ const MAPDICT = {
     UNUSED: 2 ** 12,
 
     //special
-    FOG: 2 ** 15,                            //32768 - fog should remain largest
+    FOG: 2 ** 15,                            //32768 - fog,water should remain largest!
     WATER: 2 ** 15,                          //32768 - fog,water should remain largest!
     RESERVED: 2 ** 14,                       //16384
     START_POSITION: 2 ** 13,                 //8192
+
+    //32 bit, not yet used
 };
 
 const WallSizeToHeight = (value) => {
@@ -935,6 +937,9 @@ class GA_Dimension_Agnostic_Methods {
     set(grid, bin) {
         this.assertBounds(grid);
         this.map[this.gridToIndex(grid)] |= bin;
+    }
+    iSetValue(index, value) {
+        this.map[index] = value;
     }
     setValue(grid, value) {
         this.assertBounds(grid);
@@ -1165,7 +1170,7 @@ class GA_Dimension_Agnostic_Methods {
         }
         return checks;
     }
-    Vector3_pointsAroundEntity(pos, dir, r, resolution = 4){
+    Vector3_pointsAroundEntity(pos, dir, r, resolution = 4) {
         let checks = [];
         const increment = (2 * Math.PI) / resolution;
         for (let theta = 0; theta < 2 * Math.PI; theta += increment) {

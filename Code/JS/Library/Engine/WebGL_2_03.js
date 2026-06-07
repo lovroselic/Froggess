@@ -38,7 +38,7 @@
  */
 
 const WebGL = {
-    VERSION: "2.02",
+    VERSION: "2.03",
     CSS: "color: gold",
     CTX: null,
     DEBUG: false,
@@ -2500,6 +2500,7 @@ class $3D_Camera {
     }
     isCameraSafe(pos) {
         const ZM = this.reference.map.zMap;
+        if (!ZM) return true;                               // if not ZMap we igonre this feature
         const R = WebGL.INI.CAMERA_SAFETY_RADIUS;
 
         const samples = [
