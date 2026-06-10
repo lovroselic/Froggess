@@ -361,10 +361,9 @@ const WebGL = {
         gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.initPrograms2D(gl);
-
-        // no need to init buffers, there is no world as such
+        this.initSpriteQuad(gl);
         // no needs to set world textures, same reason
-        //no need to set camere,as it is static displas
+        //no need to set camere,as it is static displax
 
         //working here
         if (this.VERBOSE) {
@@ -945,7 +944,7 @@ const WebGL = {
             },
             uniformLocations: {
                 viewProjectionMatrix: gl.getUniformLocation(shaderProgram, "uViewProjectionMatrix"),
-                modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+                modelMatrix: gl.getUniformLocation(shaderProgram, "uModelMatrix"),
                 uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
                 tint: gl.getUniformLocation(shaderProgram, "uTint"),
                 uvRect: gl.getUniformLocation(shaderProgram, "uUVRect"),
@@ -1440,6 +1439,42 @@ const WebGL = {
     },
     idToVec(id) {
         return [((id >> 0) & 0xFF) / 0xFF, ((id >> 8) & 0xFF) / 0xFF, ((id >> 16) & 0xFF) / 0xFF, ((id >> 24) & 0xFF) / 0xFF];
+    },
+    initSpriteQuad(gl) {
+        const SPRITE_QUAD = new Float32Array([
+            // x, y,   u, v
+            -0.5, -0.5, 0, 0,
+            0.5, -0.5, 1, 0,
+            -0.5, 0.5, 0, 1,
+
+            -0.5, 0.5, 0, 1,
+            0.5, -0.5, 1, 0,
+            0.5, 0.5, 1, 1,
+        ]);
+
+        const vao = gl.createVertexArray();
+        const buffer = gl.createBuffer();
+
+        gl.bindVertexArray(vao);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, SPRITE_QUAD, gl.STATIC_DRAW);
+
+        const stride = 4 * Float32Array.BYTES_PER_ELEMENT;
+
+        gl.enableVertexAttribArray(this.sprite_program.attribLocations.vertexPosition);
+        gl.vertexAttribPointer(this.sprite_program.attribLocations.vertexPosition, 2, gl.FLOAT, false, stride, 0);
+
+        gl.enableVertexAttribArray(this.sprite_program.attribLocations.textureCoord);
+        gl.vertexAttribPointer(this.sprite_program.attribLocations.textureCoord, 2, gl.FLOAT, false, stride, 2 * Float32Array.BYTES_PER_ELEMENT);
+
+        gl.bindVertexArray(null);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        this.sprite_quad = {
+            vao: vao,
+            buffer: buffer,
+            count: 6,
+        };
     },
     render2DScene(map) {
         // 2D games
@@ -2539,7 +2574,6 @@ class World {
     }
 }
 
-
 class $2D_Camera {
     constructor(width, height, x = 0, y = 0, zoom = 1.0) {
         this.width = width;
@@ -2641,6 +2675,94 @@ class $3D_Camera {
     }
     updateDir() {
         this.dir = this.reference.dir.add(this.direction_offset);
+    }
+}
+
+class $2D_Sprite {
+    constructor(grid, dir, type, tint = [1, 1, 1, 1]) {
+        this.grid = grid;
+        this.pos = GRID.gridToCenterPX(grid);
+        this.dir = dir;
+        ImportTypeToConstructor(this, type);
+        this.tint = tint;
+        this.asset = ASSET[this.asset];
+        this.Nframes = this.asset.linear.length;
+        this.nextSpriteTime = 1000 / this.fps;
+        this.currentSpriteTime = 0;
+        this.update(dir);
+        this.setVisibility();
+        this.updateModelMatrix();
+    }
+    setVisibility(visible = true) {
+        this.visible = visible;
+    }
+    rotationFromDir(dir) {
+        this.dir = dir;
+        this.rotation = dir.radAngleBetweenVectors(UP);
+    }
+    reset() {
+        this.frame = 0;
+    }
+    nextFrame() {
+        this.frame++;
+        this.frame %= this.Nframes;
+    }
+    getArea() {
+        //rotation is ignored ... fuck it
+        this.topLeft = this.pos.toTopLeft();
+        this.area = new RectArea(this.topLeft.x, this.topLeft.y, this.w, this.h);
+        return this.area;
+    }
+    update(dir) {
+        this.reset();
+        this.rotationFromDir(dir);
+        this.getArea();
+    }
+    updateModelMatrix() {
+        if (!this.modelMatrix) this.modelMatrix = glMatrix.mat4.create();
+
+        glMatrix.mat4.identity(this.modelMatrix);
+        glMatrix.mat4.translate(this.modelMatrix, this.modelMatrix, [this.pos.x, this.pos.y, 0]);
+        glMatrix.mat4.rotateZ(this.modelMatrix, this.modelMatrix, this.rotation || 0);
+        glMatrix.mat4.scale(this.modelMatrix, this.modelMatrix, [this.w, this.h, 1]);
+        return this.modelMatrix;
+    }
+    updateAnimation(lapsedTime) {
+        if (this.Nframes <= 1) return;
+        this.currentSpriteTime += lapsedTime;
+        if (this.currentSpriteTime >= this.nextSpriteTime) {
+            this.currentSpriteTime -= this.nextSpriteTime;
+            this.nextFrame();
+        }
+    }
+    setGrid(grid) {
+        this.grid = grid;
+        this.pos = GRID.gridToCenterPX(grid);
+        this.getArea();
+        this.updateModelMatrix();
+    }
+
+    setPosition(pos) {
+        this.pos = pos;
+        this.getArea();
+        this.updateModelMatrix();
+    }
+
+    move(dx, dy) {
+        this.pos.x += dx;
+        this.pos.y += dy;
+        this.getArea();
+        this.updateModelMatrix();
+    }
+}
+
+class $2D_Entity {
+    constructor() { }
+}
+
+class $2D_player extends $2D_Entity {
+    constructor() {
+
     }
 }
 

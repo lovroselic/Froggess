@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.5",
+    VERSION: "0.1.6",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -513,33 +513,24 @@ const GAME = {
     setCameraView() {
         WebGL.hero.camera2D = new $2D_Camera(ENGINE.gameWIDTH, ENGINE.gameHEIGHT);
         WebGL.camera = WebGL.hero.camera2D;
-
-        /*switch (WebGL.CONFIG.cameraType) {
-            case "first_person":
-                WebGL.hero.player.associateExternalCamera(WebGL.hero.firstPersonCamera);
-                WebGL.setCamera(WebGL.hero.firstPersonCamera);
-                break;
-            case "third_person":
-                WebGL.hero.player.associateExternalCamera(WebGL.hero.topCamera);
-                WebGL.setCamera(WebGL.hero.topCamera);
-                break;
-
-            default:
-                throw "WebGL.CONFIG.cameraType error";
-        }*/
     },
     initLevel(level) {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon(level);
-        //WebGL.MOUSE.initialize("ROOM");
         WebGL.setContext('webgl');
         this.buildWorld(level);
 
         const map = MAP[level].map;
         const start_dir = map.startPosition.vector;
-        let start_grid = MAP[level].map.startPosition.grid;
+        const start_grid = Grid.toClass(MAP[level].map.startPosition.grid);
 
-        start_grid = new Vector3(start_grid.x, HERO.height, start_grid.y);
+        console.log("start", start_grid, start_dir);
+        const HeroSprite = new $2D_Sprite(start_grid, start_dir, HERO_TYPE.Froggess);
+        console.log("HeroSprite", HeroSprite);
+        throw "dev";
+
+
+
         HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, null, 0.1); //boooo
 
         GAME.setCameraView();

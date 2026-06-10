@@ -6,7 +6,7 @@
 console.clear();
 
 const LIB = {
-    VERSION: "5.03",
+    VERSION: "5.04",
     CSS: "color: #EFE",
     log: function () {
         console.log(`%cPrototype LIB ${LIB.VERSION} loaded`, LIB.CSS);
@@ -27,6 +27,7 @@ changelog:
     : ctx.linePath
 5.03: Math.clamp
     : Math.lerp
+5.04: 
 */
 
 (function () {
@@ -788,6 +789,13 @@ class Point extends MasterGridClass {
     toAbsolute() {
         this.x = this.x + ENGINE.VIEWPORT.vx;
         this.y = this.y + ENGINE.VIEWPORT.vy;
+    }
+    toTopLeft() {
+        //change to offset
+        const half = ENGINE.INI.GRIDPIX >>> 1;
+        const x = this.x - half;
+        const y = this.y - half;
+        return new Point(x, y);
     }
     add(vector, len = 1) {
         return new Point(this.x + vector.x * len, this.y + vector.y * len);

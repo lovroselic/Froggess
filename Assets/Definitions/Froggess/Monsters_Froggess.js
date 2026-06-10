@@ -14,14 +14,14 @@
 console.log("%cMonsters for Groggess loaded.", "color: #888");
 
 const HERO_TYPE = {
-    /*ThePrincess: {
-        name: "ThePrincess",
-        model: "SlidingPrincess",
-        scale: 2.0 / 2 ** 4,
-        rotateToNorth: Math.PI,
-        material: MATERIAL.princess,
-        moveSpeed: 2.0
-    },*/
+    Froggess: {
+        name: "Froggess",
+        asset: "Froggess",
+        moveSpeed: 1.0,
+        w: 64,
+        h: 54,
+        fps: 6,
+    }
 };
 
 const MONSTER_TYPE = {
