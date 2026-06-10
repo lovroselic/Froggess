@@ -353,11 +353,11 @@ const WebGL = {
     init(layer, world, textureData, camera, decalsAreSet) {
         this.setContext(layer);
         const gl = this.CTX;
-        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.initPrograms(gl);
         this.setWorld(world);
-        this.setTexture(textureData);
+        if (textureData) this.setTexture(textureData);
         if (!decalsAreSet) this.setDecalTextures();
         this.aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
         this.setCamera(camera);

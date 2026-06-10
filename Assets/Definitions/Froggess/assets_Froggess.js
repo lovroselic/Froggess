@@ -2,12 +2,16 @@
 /*jshint -W097 */
 /*jshint -W117 */
 /*jshint -W061 */
-//Assets for DownHeel
+//Assets for Froggess
 "use strict";
 
 
 
 /** END */
+
+LoadSheetSequences = [
+    { srcName: "Froggess.png", count: 6, name: "Froggess" },
+];
 
 LoadFonts = [
 
@@ -26,6 +30,7 @@ LoadTextures = [
 
     //title
     { srcName: "Title/Froggess_title_768.webp", name: "Title" },
+    { srcName: "Title/FroggessBackground.webp", name: "FroggessBackground" },
 
     //explosions
     //{ srcName: "ObjectTextures/RedLiquid.jpg", name: "RedLiquid" },

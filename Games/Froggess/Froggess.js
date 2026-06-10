@@ -21,7 +21,7 @@ retests:
 const DEBUG = {
     SETTING: true,
     AUTO_TEST: false,
-    FPS: false,
+    FPS: true,
     VERBOSE: true,
     _2D_display: false,
     INVINCIBLE: false,
@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.2",
+    VERSION: "0.1.3",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -103,12 +103,12 @@ const PRG = {
         $(ENGINE.gameWindowId).width(ENGINE.gameWIDTH + 2 * ENGINE.sideWIDTH + 4);
         ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title", "time"], null);
         ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback", "health", "slopeinfo"], "side");
-        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
+        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
         ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback", "speed", "maxspeed", "timeinfo", "addinfo"], "fside");
         ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle"], null);
 
         if (DEBUG._2D_display) {
-            ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", "grid", "coord", "player", "debug"], null);
+            ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", , "coord", "player", "debug"], null);
         }
 
 
@@ -141,11 +141,7 @@ const HERO = {
         this.maxHealth = INI.HERO_HEALTH;
         this.restore();
     },
-    speak(txt) {
-        SPEECH.use("Princess");
-        SPEECH.speakWithArticulation(txt);
-        TURN.subtitle(txt);
-    },
+
     concludeAction() {
         if (WebGL.CONFIG.firstperson && !this.player.lookingAround && Math.abs(this.player.camera.direction_offset.y) > 0) {
             this.player.resetCamera();
@@ -329,7 +325,6 @@ const HERO = {
     restore() {
         this.dead = false;
         this.health = this.maxHealth;
-        TITLE.health();
     },
     flightOn() {
 
@@ -469,13 +464,17 @@ const GAME = {
         ENGINE.GAME.start(16);
 
         GAME.level = 1;
+        GAME.lives = 3;
 
-        throw "DEV";
+
 
         HERO.construct();
         ENGINE.VECTOR2D.configure("player");
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
+        ENGINE.draw("background", (ENGINE.gameWIDTH - TEXTURE.FroggessBackground.width) / 2, (ENGINE.gameHEIGHT - TEXTURE.FroggessBackground.height) / 2, TEXTURE.FroggessBackground);
+
+        //throw "here";
 
 
         if (DEBUG.AUTO_TEST) {
@@ -503,16 +502,11 @@ const GAME = {
         console.log("starting level", GAME.level);
 
         this.levelComplete = false;
-        //this.realSpeed = 0;
-        //this.highSpeed = 0;
-        //this.timerRunning = false;
         if (GAME.time) GAME.time.unregister();
         GAME.time = null;
-        //WebGL.playerList.clear();                           //requred for restart after resurrection
 
-        
+        //throw "DEV level start";
         GAME.initLevel(GAME.level);
-        //WebGL.GAME.setThirdPerson();                            //my preference
         GAME.continueLevel(GAME.level);
     },
     continueLevel(level) {
@@ -520,8 +514,8 @@ const GAME = {
     },
     levelExecute() {
         GAME.drawFirstFrame(GAME.level);
+        throw "DEV";
         ENGINE.GAME.resume();
-        HERO.speak(MAP_TEXT[GAME.level].text);
     },
     setCameraView() {
         WebGL.hero.firstPersonCamera = new $3D_Camera(WebGL.hero.player, DIR_NOWAY, 0.0, new Vector3(0, 0, 0), 0);
@@ -549,33 +543,24 @@ const GAME = {
         this.buildWorld(level);
 
         const map = MAP[level].map;
-        let start_dir = map.startPosition.vector;
-        let start_index = map.GA.gridToIndex(map.startPosition.grid);
-        let start_quad = map.quadMap.map[start_index];
-        let start_grid = start_quad.getSurfaceCenter();
-        let z = map.zMap.getZ(start_grid.x, start_grid.y);
-        start_grid = new Vector3(start_grid.x, HERO.height + z, start_grid.y);
-        HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, HERO_TYPE.ThePrincess, 0.1);
+        const start_dir = map.startPosition.vector;
+        let start_grid = MAP[level].map.startPosition.grid;
+
+        start_grid = new Vector3(start_grid.x, HERO.height, start_grid.y);
+        HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, null, 0.1); //boooo
 
         GAME.setCameraView();
-        SPAWN_TOOLS.spawnSunFromCamera(HERO.player.pos.add(INI.SUN_VECTOR), LIGHT_COLORS.weakSun);
         GAME.setWorld(level);
+        throw "debug init";
+
     },
     setWorld(level, decalsAreSet = false) {
         console.time("setWorld");
-        const textureData = {
-            wall: TEXTURE[MAP[level].wall],
-            floor: TEXTURE[MAP[level].floor],
-            frontPanorama: TEXTURE[MAP[level].frontPanorama],
-            leftPanorama: TEXTURE[MAP[level].leftPanorama],
-            rightPanorama: TEXTURE[MAP[level].rightPanorama],
-            backPanorama: TEXTURE[MAP[level].backPanorama],
-            archPanorama: TEXTURE[MAP[level].archPanorama],
-            skyPanorama: TEXTURE[MAP[level].skyPanorama],
-            floorPanorama: TEXTURE.SnowFloorPanoramaTexture,                    //fixed
-        };
+        const textureData = null;
 
         WebGL.updateShaders();
+
+        //throw "debug set world";
 
         if (WebGL.CONFIG.firstperson) {
             WebGL.init('webgl', MAP[level].world, textureData, WebGL.hero.player, decalsAreSet);              //firstperson
@@ -588,11 +573,8 @@ const GAME = {
     buildWorld(level) {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
         WebGL.init_required_IAM(MAP[level].map, HERO);
-        MAP[level].map.quadMap = QUAD_MAP.create(MAP[level].map.GA, MAP[level].terrain);
-        MAP[level].map.zMap = QUAD_MAP.create_zMap(MAP[level].map.quadMap, MAP[level].map.GA);
-        MAP[level].map.zMap1 = QUAD_MAP.create_zMap(MAP[level].map.quadMap, MAP[level].map.GA, INI.OCCLUSION_RESOLUTION);
         SPAWN_TOOLS.spawn(level);
-        MAP[level].world = WORLD.buildSurfaceBasedWorld(MAP[level].map);
+        MAP[level].world = WORLD.build(MAP[level].map);
     },
     newDungeon(level) {
         MAP_TOOLS.unpack(level);
