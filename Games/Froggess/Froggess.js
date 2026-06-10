@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.4",
+    VERSION: "0.1.5",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -88,9 +88,8 @@ const PRG = {
         });
 
 
-
         //boxes
-        ENGINE.gameWIDTH = 1024;
+        ENGINE.gameWIDTH = 960;
         ENGINE.titleWIDTH = 1280 + INI.SCREEN_BORDER;
         ENGINE.sideWIDTH = ENGINE.titleWIDTH - ENGINE.gameWIDTH - INI.SCREEN_BORDER;
         ENGINE.gameHEIGHT = 768;
@@ -457,7 +456,7 @@ const GAME = {
         ENGINE.GAME.pauseBlock();
         ENGINE.GAME.paused = true;
 
-        let GameRD = new RenderData("Carolingia", 60, "#fF2010", "text", "#444444", 2, 2, 2);
+        let GameRD = new RenderData("Moria", 60, "#fF2010", "text", "#444444", 2, 2, 2);
         ENGINE.TEXT.setRD(GameRD);
         ENGINE.watchVisibility(ENGINE.GAME.lostFocus);
         ENGINE.GAME.setGameLoop(GAME.run);
@@ -466,17 +465,12 @@ const GAME = {
         GAME.level = 1;
         GAME.lives = 3;
 
-
-
         HERO.construct();
         ENGINE.VECTOR2D.configure("player");
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
-        const xoff = (ENGINE.gameWIDTH - TEXTURE.FroggessBackground.width) / 2;
-        const yoff = (ENGINE.gameHEIGHT - TEXTURE.FroggessBackground.height) / 2;
-        ENGINE.draw("background", xoff, yoff, TEXTURE.FroggessBackground);
-        GRID.grid(xoff, yoff);
-
+        ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
+        GRID.grid();
 
         if (DEBUG.AUTO_TEST) {
             return DEBUG.automaticTests();
@@ -517,10 +511,10 @@ const GAME = {
         ENGINE.GAME.resume();
     },
     setCameraView() {
-        WebGL.hero.firstPersonCamera = new $3D_Camera(WebGL.hero.player, DIR_NOWAY, 0.0, new Vector3(0, 0, 0), 0);
-        WebGL.hero.topCamera = new $3D_Camera(WebGL.hero.player, DIR_UP, 0.5, new Vector3(0, -0.30, 0), 0.45, 80);
+        WebGL.hero.camera2D = new $2D_Camera(ENGINE.gameWIDTH, ENGINE.gameHEIGHT);
+        WebGL.camera = WebGL.hero.camera2D;
 
-        switch (WebGL.CONFIG.cameraType) {
+        /*switch (WebGL.CONFIG.cameraType) {
             case "first_person":
                 WebGL.hero.player.associateExternalCamera(WebGL.hero.firstPersonCamera);
                 WebGL.setCamera(WebGL.hero.firstPersonCamera);
@@ -532,12 +526,12 @@ const GAME = {
 
             default:
                 throw "WebGL.CONFIG.cameraType error";
-        }
+        }*/
     },
     initLevel(level) {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon(level);
-        WebGL.MOUSE.initialize("ROOM");
+        //WebGL.MOUSE.initialize("ROOM");
         WebGL.setContext('webgl');
         this.buildWorld(level);
 
@@ -552,25 +546,14 @@ const GAME = {
         GAME.setWorld(level);
 
     },
-    setWorld(level, decalsAreSet = false) {
-        console.time("setWorld");
-        const textureData = null;
-
-        WebGL.updateShaders();
-
-        if (WebGL.CONFIG.firstperson) {
-            WebGL.init('webgl', MAP[level].world, textureData, WebGL.hero.player, decalsAreSet);              //firstperson
-        } else {
-            WebGL.init('webgl', MAP[level].world, textureData, WebGL.hero.topCamera, decalsAreSet);           //thirdperson
-        }
-
-        console.timeEnd("setWorld");
+    setWorld(level) {
+        WebGL.init2D('webgl');
     },
     buildWorld(level) {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
         WebGL.init_required_IAM(MAP[level].map, HERO);
         SPAWN_TOOLS.spawn(level);
-        MAP[level].world = WORLD.build(MAP[level].map);
+        //MAP[level].world = WORLD.build(MAP[level].map);
     },
     newDungeon(level) {
         MAP_TOOLS.unpack(level);
@@ -640,7 +623,7 @@ const GAME = {
         if (DEBUG._2D_display) {
             GAME.drawPlayer();
         }
-        //WebGL.renderScene(MAP[GAME.level].map);
+        WebGL.render2DScene(MAP[GAME.level].map);
 
         if (DEBUG.FPS) {
             GAME.FPS(lapsedTime);
@@ -756,7 +739,7 @@ const TITLE = {
     },
     startTitle() {
         if (DEBUG.VERBOSE) console.log("TITLE started");
-        if (AUDIO.Title) AUDIO.Title.play(); //dev
+        //if (AUDIO.Title) AUDIO.Title.play(); //dev
 
         ENGINE.GAME.pauseBlock();
         TITLE.clearAllLayers();
@@ -772,7 +755,7 @@ const TITLE = {
     },
     clearAllLayers() {
         ENGINE.layersToClear = new Set(["text",
-            "sideback", "button", "title", "FPS", "info", "subtitle", 
+            "sideback", "button", "title", "FPS", "info", "subtitle",
             "bottomText"]);
         ENGINE.clearLayerStack();
         WebGL.transparent();

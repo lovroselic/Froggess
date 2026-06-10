@@ -172,6 +172,7 @@ const WebGL = {
     },
     programs_compiled: false,
     program: null,
+    sprite_program: null,
     pickProgram: null,
     buffer: null,
     texture: null,
@@ -236,6 +237,10 @@ const WebGL = {
         vSource: "shadow_vShader",
         fSource: "shadow_fShader",
         program: null,
+    },
+    sprite_program: {
+        vSource: "vShader2D",
+        fSource: "fShader2D",
     },
     update_shaders_forLightSources: ['fShader'],
     hero: null,
@@ -350,6 +355,29 @@ const WebGL = {
         this.world = world;
         this.initAllBuffers(gl, world);
     },
+    init2D(layer) {
+        this.setContext(layer);
+        const gl = this.CTX;
+        gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        this.initPrograms2D(gl);
+
+        // no need to init buffers, there is no world as such
+        // no needs to set world textures, same reason
+        //no need to set camere,as it is static displas
+
+        //working here
+        if (this.VERBOSE) {
+            console.log(`%cWebGL:`, this.CSS, this);
+
+            console.log({
+                maxVertexAttribs: gl.getParameter(gl.MAX_VERTEX_ATTRIBS),
+                maxVertexUniformVectors: gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS),
+                maxElementVertices: gl.getParameter(gl.MAX_ELEMENTS_VERTICES),
+                maxElementIndices: gl.getParameter(gl.MAX_ELEMENTS_INDICES),
+            });
+        }
+    },
     init(layer, world, textureData, camera, decalsAreSet) {
         this.setContext(layer);
         const gl = this.CTX;
@@ -378,6 +406,11 @@ const WebGL = {
         this.initBuffers(gl, world);
         this.setPickBuffers(gl);
         this.setModelBuffers(gl);
+    },
+    initPrograms2D(gl) {
+        if (this.programs_compiled) return;
+        this.initSpriteProgram(gl);
+        this.programs_compiled = true;
     },
     initPrograms(gl) {
         if (this.programs_compiled) return;
@@ -890,6 +923,37 @@ const WebGL = {
             this.checkUniformVectorUsage(gl, shaderProgram, vSource, fSource);
         }
     },
+    initSpriteProgram(gl) {
+        const vSource = SHADER[this.sprite_program.vSource];
+        const fSource = SHADER[this.sprite_program.fSource];
+        const vertexShader = this.loadShader(gl, gl.VERTEX_SHADER, vSource);
+        const fragmentShader = this.loadShader(gl, gl.FRAGMENT_SHADER, fSource);
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            console.error(`Unable to initialize the shader program: ${gl.getProgramInfoLog(shaderProgram)}`);
+            return null;
+        }
+
+        const programInfo = {
+            program: shaderProgram,
+            attribLocations: {
+                vertexPosition: gl.getAttribLocation(shaderProgram, "aVertexPosition"),
+                textureCoord: gl.getAttribLocation(shaderProgram, "aTextureCoord"),
+            },
+            uniformLocations: {
+                viewProjectionMatrix: gl.getUniformLocation(shaderProgram, "uViewProjectionMatrix"),
+                modelViewMatrix: gl.getUniformLocation(shaderProgram, "uModelViewMatrix"),
+                uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
+                tint: gl.getUniformLocation(shaderProgram, "uTint"),
+                uvRect: gl.getUniformLocation(shaderProgram, "uUVRect"),
+            },
+        };
+
+        this.sprite_program = programInfo;
+    },
     initShaderProgram(gl) {
         const vSource = SHADER[this.main_program.vSource];
         const fSource = SHADER[this.main_program.fSource];
@@ -1079,6 +1143,11 @@ const WebGL = {
         gl.drawElements(gl.TRIANGLES, this.world.offset[`${type}_count`], gl.UNSIGNED_SHORT, this.world.offset[`${type}_start`] * 2);
     },
     renderScene(map, unlit = false) {
+        // 3D games
+        // perspective projection
+        // lookAt camera
+        // lighting shaders
+        // model uniforms
         const gl = this.CTX;
         gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
         gl.clearDepth(1.0);
@@ -1371,6 +1440,25 @@ const WebGL = {
     },
     idToVec(id) {
         return [((id >> 0) & 0xFF) / 0xFF, ((id >> 8) & 0xFF) / 0xFF, ((id >> 16) & 0xFF) / 0xFF, ((id >> 24) & 0xFF) / 0xFF];
+    },
+    render2DScene(map) {
+        // 2D games
+        // orthographic camera
+        // sprite shaders
+        const gl = this.CTX;
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.disable(gl.DEPTH_TEST);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        gl.useProgram(this.sprite_program.program);
+        WebGL.camera.update();
+
+
+        //working here
+
     },
     DATA: {
         window: null,
@@ -2451,6 +2539,39 @@ class World {
     }
 }
 
+
+class $2D_Camera {
+    constructor(width, height, x = 0, y = 0, zoom = 1.0) {
+        this.width = width;
+        this.height = height;
+        this.zoom = zoom;
+        this.position = {
+            x: x,
+            y: y
+        };
+        this.projectionMatrix = glMatrix.mat4.create();                     // camera/screen space -> clip space
+        this.viewMatrix = glMatrix.mat4.create();                           // world space -> camera/screen space
+        this.viewProjectionMatrix = glMatrix.mat4.create();                 // world space -> clip space
+
+        this.update();
+    }
+    update() {
+        // 2D screen coordinates, reverting openGl y is up to display's y is down!:
+        // x: left -> right
+        // y: top -> bottom
+        glMatrix.mat4.ortho(this.projectionMatrix, 0, this.width, this.height, 0, -1, 1);
+        glMatrix.mat4.identity(this.viewMatrix);
+
+        // View transform, move the world opposite of the camera:
+        // world position -> camera/screen position
+        // camera-space x = (world.x - camera.x) * zoom
+        // camera-space y = (world.y - camera.y) * zoom
+        glMatrix.mat4.scale(this.viewMatrix, this.viewMatrix, [this.zoom, this.zoom, 1]);
+        glMatrix.mat4.translate(this.viewMatrix, this.viewMatrix, [-this.position.x, -this.position.y, 0]);
+        glMatrix.mat4.multiply(this.viewProjectionMatrix, this.projectionMatrix, this.viewMatrix);
+    }
+
+}
 class $3D_Camera {
     constructor(reference, translation_direction, translation_offset, direction_offset, back_offset = 1, fov = 70) {
         this.translation_direction = translation_direction;
