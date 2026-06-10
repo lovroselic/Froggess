@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.3",
+    VERSION: "0.1.4",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -101,10 +101,10 @@ const PRG = {
 
         $("#bottom").css("margin-top", ENGINE.gameHEIGHT + ENGINE.titleHEIGHT + ENGINE.bottomHEIGHT);
         $(ENGINE.gameWindowId).width(ENGINE.gameWIDTH + 2 * ENGINE.sideWIDTH + 4);
-        ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title", "time"], null);
-        ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback", "health", "slopeinfo"], "side");
+        ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title"], null);
+        ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback",], "side");
         ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
-        ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback", "speed", "maxspeed", "timeinfo", "addinfo"], "fside");
+        ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback"], "fside");
         ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle"], null);
 
         if (DEBUG._2D_display) {
@@ -472,9 +472,10 @@ const GAME = {
         ENGINE.VECTOR2D.configure("player");
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
-        ENGINE.draw("background", (ENGINE.gameWIDTH - TEXTURE.FroggessBackground.width) / 2, (ENGINE.gameHEIGHT - TEXTURE.FroggessBackground.height) / 2, TEXTURE.FroggessBackground);
-
-        //throw "here";
+        const xoff = (ENGINE.gameWIDTH - TEXTURE.FroggessBackground.width) / 2;
+        const yoff = (ENGINE.gameHEIGHT - TEXTURE.FroggessBackground.height) / 2;
+        ENGINE.draw("background", xoff, yoff, TEXTURE.FroggessBackground);
+        GRID.grid(xoff, yoff);
 
 
         if (DEBUG.AUTO_TEST) {
@@ -505,7 +506,6 @@ const GAME = {
         if (GAME.time) GAME.time.unregister();
         GAME.time = null;
 
-        //throw "DEV level start";
         GAME.initLevel(GAME.level);
         GAME.continueLevel(GAME.level);
     },
@@ -514,7 +514,6 @@ const GAME = {
     },
     levelExecute() {
         GAME.drawFirstFrame(GAME.level);
-        throw "DEV";
         ENGINE.GAME.resume();
     },
     setCameraView() {
@@ -551,7 +550,6 @@ const GAME = {
 
         GAME.setCameraView();
         GAME.setWorld(level);
-        throw "debug init";
 
     },
     setWorld(level, decalsAreSet = false) {
@@ -559,8 +557,6 @@ const GAME = {
         const textureData = null;
 
         WebGL.updateShaders();
-
-        //throw "debug set world";
 
         if (WebGL.CONFIG.firstperson) {
             WebGL.init('webgl', MAP[level].world, textureData, WebGL.hero.player, decalsAreSet);              //firstperson
@@ -580,7 +576,7 @@ const GAME = {
         MAP_TOOLS.unpack(level);
     },
     prepareForRestart() {
-        let clear = ["background", "text", "FPS", "button", "bottomText", "slopeinfo", "timeinfo"];
+        let clear = ["background", "text", "FPS", "button", "bottomText"];
         ENGINE.clearManylayers(clear);
         TITLE.blackBackgrounds();
         ENGINE.TIMERS.clear();
@@ -630,13 +626,13 @@ const GAME = {
     run(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
         const date = Date.now();
-        HERO.player.animateAction();
+        //HERO.player.animateAction();
         EXPLOSION3D.manage(date);
-        GAME.respond(lapsedTime);
+        //GAME.respond(lapsedTime);
         ENGINE.TIMERS.update();
-        HERO.manage(lapsedTime);
+        //HERO.manage(lapsedTime);
         GAME.frameDraw(lapsedTime);
-        HERO.concludeAction();
+        //HERO.concludeAction();
         if (HERO.dead) IAM.checkIfProcessesComplete([EXPLOSION3D], HERO.death);
         if (GAME.completed) GAME.won();
     },
@@ -644,9 +640,7 @@ const GAME = {
         if (DEBUG._2D_display) {
             GAME.drawPlayer();
         }
-        WebGL.renderScene(MAP[GAME.level].map);
-        TITLE.speed();
-        TITLE.time();
+        //WebGL.renderScene(MAP[GAME.level].map);
 
         if (DEBUG.FPS) {
             GAME.FPS(lapsedTime);
@@ -778,8 +772,7 @@ const TITLE = {
     },
     clearAllLayers() {
         ENGINE.layersToClear = new Set(["text",
-            "sideback", "button", "title", "FPS", "info", "subtitle", "health",
-            "speed", "maxspeed", "time", "addinfo",
+            "sideback", "button", "title", "FPS", "info", "subtitle", 
             "bottomText"]);
         ENGINE.clearLayerStack();
         WebGL.transparent();

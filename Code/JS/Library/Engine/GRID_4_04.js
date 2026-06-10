@@ -144,21 +144,21 @@ const GRID = {
     pointToGrid(point) {
         return this.coordToGrid(point.x, point.y);
     },
-    grid(CTX = LAYER.grid) {
+    grid(xoff = 0, yoff = 0, CTX = LAYER.grid) {
         const gp = ENGINE.INI.GRIDPIX;
         const dash = 4;
         CTX.fillStyle = "#AAA";
 
         // horizontal dotted lines
-        for (let y = gp; y < CTX.canvas.height; y += gp) {
-            for (let x = 0; x < CTX.canvas.width; x += dash) {
+        for (let y = gp + yoff; y < CTX.canvas.height - yoff; y += gp) {
+            for (let x = 0 + xoff; x < CTX.canvas.width - xoff; x += dash) {
                 CTX.fillRect(x, y, 1, 1);
             }
         }
 
         // vertical dotted lines
-        for (let x = gp; x < CTX.canvas.width; x += gp) {
-            for (let y = 0; y < CTX.canvas.height; y += dash) {
+        for (let x = gp + xoff; x < CTX.canvas.width - xoff; x += gp) {
+            for (let y = 0 + xoff; y < CTX.canvas.height - yoff; y += dash) {
                 CTX.fillRect(x, y, 1, 1);
             }
         }
