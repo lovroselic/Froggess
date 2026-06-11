@@ -2803,13 +2803,13 @@ class $2D_player extends $2D_Entity {
     }
     move(dir) {
         const nextGrid = this.moveState.startGrid.add(dir);
-        console.warn("try moving dir", dir, "oob", this.GA.isOutOfBounds(nextGrid), "wall", this.GA.isWall(nextGrid));
+        //console.warn("try moving dir", dir, "oob", this.GA.isOutOfBounds(nextGrid), "wall", this.GA.isWall(nextGrid));
         if (this.GA.isOutOfBounds(nextGrid)) return;
         if (this.GA.isWall(nextGrid)) return;
 
         //allowed moves so far: EMPTY, HOLE
         const nextValue = this.GA.getValue(nextGrid);
-        console.log(".player start moving", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
+        console.log(".player start moving dir", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
         this.startMoving(dir);
     }
     respond(lapsedTime) {
