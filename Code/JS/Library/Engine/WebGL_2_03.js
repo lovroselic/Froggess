@@ -2842,6 +2842,14 @@ class $2D_player extends $2D_Entity {
             return;
         }
     }
+    continueMove(lapsedTime) {
+        if (!this.moveState.moving) return;
+        GRID.translateMove2D(this, lapsedTime, this.checkEndMove.bind(this), true);
+    }
+    checkEndMove() {
+        const endValue = this.GA.getValue(this.moveState.startGrid);
+        console.warn("checking end move, this.moveState.startGrid", this.moveState.startGrid, endValue, REVERSED_MAPDICT[endValue]);
+    }
 }
 
 class $3D_player {
