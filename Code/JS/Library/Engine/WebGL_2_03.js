@@ -1481,6 +1481,7 @@ const WebGL = {
         // orthographic camera
         // sprite shaders
         const gl = this.CTX;
+        const program = this.sprite_program;
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
         gl.clearColor(0.0, 0.0, 0.0, WebGL.INI.BACKGROUND_ALPHA);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -1488,12 +1489,21 @@ const WebGL = {
         gl.enable(gl.BLEND);
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-        gl.useProgram(this.sprite_program.program);
+        gl.useProgram(program.program);
         WebGL.camera.update();
 
+        gl.uniformMatrix4fv(program.uniformLocations.viewProjectionMatrix, false, WebGL.camera.viewProjectionMatrix);
+        gl.uniform1i(program.uniformLocations.uSampler, 0);
+        gl.bindVertexArray(this.sprite_quad.vao);
 
-        //working here
+        // draw non-player entities , to be added later
 
+
+        // draw HERO/player 
+        if (WebGL.hero && WebGL.hero.player) WebGL.hero.player.draw(gl, program, this.sprite_quad);
+
+        gl.bindVertexArray(null);
+        gl.bindTexture(gl.TEXTURE_2D, null);
     },
     DATA: {
         window: null,
@@ -2606,6 +2616,7 @@ class $2D_Camera {
     }
 
 }
+
 class $3D_Camera {
     constructor(reference, translation_direction, translation_offset, direction_offset, back_offset = 1, fov = 70) {
         this.translation_direction = translation_direction;
@@ -2688,7 +2699,6 @@ class $2D_Sprite {
         this.asset = ASSET[this.asset];
         this.Nframes = this.asset.linear.length;
         this.nextSpriteTime = 1000 / this.fps;
-        this.currentSpriteTime = 0;
         this.update(dir);
         this.setVisibility();
         this.updateModelMatrix();
@@ -2702,6 +2712,7 @@ class $2D_Sprite {
     }
     reset() {
         this.frame = 0;
+        this.currentSpriteTime = 0;
     }
     nextFrame() {
         this.frame++;
@@ -2741,18 +2752,19 @@ class $2D_Sprite {
         this.getArea();
         this.updateModelMatrix();
     }
-
     setPosition(pos) {
         this.pos = pos;
         this.getArea();
         this.updateModelMatrix();
     }
-
     move(dx, dy) {
         this.pos.x += dx;
         this.pos.y += dy;
         this.getArea();
         this.updateModelMatrix();
+    }
+    getSpriteTexture() {
+        return this.asset.textures[this.frame];
     }
 }
 
@@ -2761,11 +2773,21 @@ class $2D_Entity {
         this.sprite = new $2D_Sprite(grid, dir, type);
         this.moveState = new MoveState(grid, dir, GA);
     }
+    draw(gl, program, spriteQuad) {
+        const texture = this.sprite.getSpriteTexture();
+        const modelMatrix = this.sprite.updateModelMatrix();
+        gl.uniformMatrix4fv(program.uniformLocations.modelMatrix, false, modelMatrix);
+        gl.uniform4fv(program.uniformLocations.tint, this.sprite.tint);
+        gl.uniform4fv(program.uniformLocations.uvRect, [0, 0, 1, 1]);                           //frames are presplit, keep this for future compatibility, texture atlases
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.drawArrays(gl.TRIANGLES, 0, spriteQuad.count);
+    }
 }
 
 class $2D_player extends $2D_Entity {
-    constructor(grid, dir, type) {
-        super(grid, dir, type);
+    constructor(grid, dir, type, GA) {
+        super(grid, dir, type, GA);
     }
 }
 

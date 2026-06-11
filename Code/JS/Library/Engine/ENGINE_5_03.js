@@ -52,7 +52,7 @@ const BELOW3 = new Vector3D(0, 0, -1);
 const ABOVE3 = new Vector3D(0, 0, 1);
 
 const ENGINE = {
-    VERSION: "5.02",
+    VERSION: "5.03",
     CSS: "color: #0FA",
     INI: {
         ANIMATION_INTERVAL: 16,
@@ -3248,12 +3248,20 @@ const ASSET = {
             ASSET[target][face] = [];
             for (let i = 0, LN = ASSET[original][face].length; i < LN; i++) {
                 let originalSprite = ASSET[original][face][i];
-                ASSET[target][face].push(
-                    ENGINE.grayScaleImg(
-                        ASSET[original][face][i],
-                        `${target}_${face}_${i}`
-                    )
-                );
+                ASSET[target][face].push(ENGINE.grayScaleImg(ASSET[original][face][i], `${target}_${face}_${i}`));
+            }
+        }
+    },
+    convertToTextures() {
+        for (const asset in ASSET) {
+            const A = ASSET[asset];
+            if (typeof A !== "object") continue;
+            if (A.textures) continue;
+            if (A.linear) {
+                A.textures = Array(A.linear.length);
+                for (const [i, img] of A.linear.entries()) {
+                    A.textures[i] = WebGL.createTexture(img);
+                }
             }
         }
     }

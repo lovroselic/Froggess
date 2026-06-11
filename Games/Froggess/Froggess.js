@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.7",
+    VERSION: "0.2.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -517,7 +517,7 @@ const GAME = {
     initLevel(level) {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon();
-        WebGL.setContext('webgl');
+        //WebGL.setContext('webgl');
         this.buildWorld(level);
 
         const map = MAP.main.map;
@@ -526,21 +526,12 @@ const GAME = {
 
         console.log("start", start_grid, start_dir, "map", map);
 
-        const HERO_Entity = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
-        console.log("HERO_Entity", HERO_Entity);
-
-
-
-        ///////////////////////////////////////////////////////
-        throw "dev";
-
-
-
-        //HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, null, 0.1); //boooo
+        HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
+        console.log("HERO.player", HERO.player);
 
         GAME.setCameraView();
         GAME.setWorld();
-
+        //throw "dev";
     },
     setWorld() {
         WebGL.init2D('webgl');
@@ -549,7 +540,7 @@ const GAME = {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
         WebGL.init_required_IAM(MAP.main.map, HERO);
         //SPAWN_TOOLS.spawn(level);
-   
+
     },
     newDungeon() {
         MAP_TOOLS.unpack("main");
@@ -564,6 +555,8 @@ const GAME = {
         console.log("GAME SETUP started");
         $("#conv").remove();
         GAME.WebGL_settings();
+        WebGL.setContext('webgl');
+        ASSET.convertToTextures();
     },
     setTitle() {
         const text = GAME.generateTitleText();
