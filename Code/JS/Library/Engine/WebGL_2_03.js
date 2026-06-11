@@ -2757,12 +2757,15 @@ class $2D_Sprite {
 }
 
 class $2D_Entity {
-    constructor() { }
+    constructor(grid, dir, type, GA) {
+        this.sprite = new $2D_Sprite(grid, dir, type);
+        this.moveState = new MoveState(grid, dir, GA);
+    }
 }
 
 class $2D_player extends $2D_Entity {
-    constructor() {
-
+    constructor(grid, dir, type) {
+        super(grid, dir, type);
     }
 }
 

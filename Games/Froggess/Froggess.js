@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.1.6",
+    VERSION: "0.1.7",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -501,9 +501,9 @@ const GAME = {
         GAME.time = null;
 
         GAME.initLevel(GAME.level);
-        GAME.continueLevel(GAME.level);
+        GAME.continueLevel();
     },
-    continueLevel(level) {
+    continueLevel() {
         GAME.levelExecute();
     },
     levelExecute() {
@@ -516,38 +516,43 @@ const GAME = {
     },
     initLevel(level) {
         if (DEBUG.VERBOSE) console.info("init level", level);
-        this.newDungeon(level);
+        this.newDungeon();
         WebGL.setContext('webgl');
         this.buildWorld(level);
 
-        const map = MAP[level].map;
+        const map = MAP.main.map;
         const start_dir = map.startPosition.vector;
-        const start_grid = Grid.toClass(MAP[level].map.startPosition.grid);
+        const start_grid = Grid.toClass(map.startPosition.grid);
 
-        console.log("start", start_grid, start_dir);
-        const HeroSprite = new $2D_Sprite(start_grid, start_dir, HERO_TYPE.Froggess);
-        console.log("HeroSprite", HeroSprite);
+        console.log("start", start_grid, start_dir, "map", map);
+
+        const HERO_Entity = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
+        console.log("HERO_Entity", HERO_Entity);
+
+
+
+        ///////////////////////////////////////////////////////
         throw "dev";
 
 
 
-        HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, null, 0.1); //boooo
+        //HERO.player = new $3D_player(start_grid, Vector3.from_2D_dir(start_dir), MAP[level].map, null, 0.1); //boooo
 
         GAME.setCameraView();
-        GAME.setWorld(level);
+        GAME.setWorld();
 
     },
-    setWorld(level) {
+    setWorld() {
         WebGL.init2D('webgl');
     },
     buildWorld(level) {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
-        WebGL.init_required_IAM(MAP[level].map, HERO);
-        SPAWN_TOOLS.spawn(level);
-        //MAP[level].world = WORLD.build(MAP[level].map);
+        WebGL.init_required_IAM(MAP.main.map, HERO);
+        //SPAWN_TOOLS.spawn(level);
+   
     },
-    newDungeon(level) {
-        MAP_TOOLS.unpack(level);
+    newDungeon() {
+        MAP_TOOLS.unpack("main");
     },
     prepareForRestart() {
         let clear = ["background", "text", "FPS", "button", "bottomText"];
