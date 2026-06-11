@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.2.0",
+    VERSION: "0.2.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -102,12 +102,14 @@ const PRG = {
         $(ENGINE.gameWindowId).width(ENGINE.gameWIDTH + 2 * ENGINE.sideWIDTH + 4);
         ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title"], null);
         ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback",], "side");
-        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
+        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "coord", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
         ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback"], "fside");
         ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle"], null);
 
+        MAP_TOOLS.use2D();
+
         if (DEBUG._2D_display) {
-            ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", , "coord", "player", "debug"], null);
+            ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", "player", "debug"], null);
         }
 
 
@@ -125,10 +127,8 @@ const PRG = {
         $(ENGINE.topCanvas).off("mousemove", ENGINE.mouseOver);
         $(ENGINE.topCanvas).off("click", ENGINE.mouseClick);
         $(ENGINE.topCanvas).css("cursor", "");
-
         $("#startGame").addClass("hidden");
         ENGINE.disableDefaultKeys();
-
         TITLE.startTitle();
     }
 };
@@ -136,29 +136,10 @@ const PRG = {
 const HERO = {
     construct() {
         this.player = null;
-        this.height = INI.HERO_HEIGHT;
-        this.maxHealth = INI.HERO_HEALTH;
-        this.restore();
+        this.dead = false;
     },
-
     concludeAction() {
-        if (WebGL.CONFIG.firstperson && !this.player.lookingAround && Math.abs(this.player.camera.direction_offset.y) > 0) {
-            this.player.resetCamera();
-        }
-
-        this.player.lookingAround = false;
-
-        if (["Sliding", "RightMove", "LeftMove", "Breaking"].includes(this.player.mode)) {
-            this.player.setMode("Sliding");
-        } else if (!this.player.actionModes.includes(this.player.mode)) this.player.setMode("idle");
-
-    },
-    applyDamage(damage) {
-        HERO.health = Math.max(HERO.health - damage, 0);
-        TITLE.health();
-        if (HERO.health <= 0) {
-            if (!DEBUG.INVINCIBLE) HERO.die();
-        }
+        if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
     },
     die() {
         if (HERO.dead) return;
@@ -168,140 +149,6 @@ const HERO = {
         $(AUDIO.PrincessScream).one("ended", HERO.endSpeech);
         AUDIO.PrincessScream.play();
         HERO.finalDeath();
-    },
-    endSpeech() {
-        const texts = [
-            "Is this game too hard for you? Maybe you should play something less sophisticated",
-            "Next time maybe try to avoid hitting this wall?",
-            "Your playing sucks",
-            "Are you blind? Not into the wall, silly!",
-            "Ah yes, the ancient strategy of steering directly into stone.",
-            "Wonderful. The wall has won again.",
-            "I am starting to suspect the wall is your actual destination.",
-            "That was not a shortcut, that was architecture.",
-            "My royal backside demands a better pilot.",
-            "Do you steer with your elbows?",
-            "Snow, slope, open path, and somehow you chose wall.",
-            "Congratulations, you found the least elegant route down the mountain.",
-            "The wall sends its compliments, and also my bruises.",
-            "I have seen drunken goats with better line control.",
-            "Was that a turn, or a cry for help?",
-            "Try using the path next time, it is the big white thing without rocks.",
-            "Excellent crash. Terrible skiing. No notes.",
-            "If stupidity had traction, we would be uphill by now.",
-            "That impact had more planning than your steering.",
-            "I hope the wall enjoyed that, because I certainly did not.",
-            "My royal medical bill will be sent to your ego.",
-            "You missed the turn by only one entire mountain.",
-            "I asked for speed, not masonry inspection.",
-            "Next time, aim for the gap. It is the suspiciously empty part.",
-            "The good news is, the wall is still standing. Unlike my dignity.",
-            "You drive like a snowman having a panic attack.",
-            "I am a princess, not a demolition permit.",
-            "Try to miss the wall, next time.",
-            "Not only my royal butt, also my royal head hurts.",
-            "Steering clear of fatal acidents is not your strong suit.",
-            "Did you lose a fight with the concept of turning?",
-            "I have more control sliding on my butt than you have with both hands.",
-            "That wall was visible from orbit, genius.",
-            "Were you aiming, or just emotionally collapsing?",
-            "Brilliant. You weaponized incompetence.",
-            "The mountain has many paths, and you chose blunt trauma.",
-            "I have met icicles with better decision making.",
-            "Your steering belongs in a museum of bad ideas.",
-            "My kingdom has fallen to a player with the reflexes of wet bread.",
-            "You missed the road so hard I felt it in my head.",
-            "Did the wall insult your family, or are you just like this?",
-            "If bad driving were royal service, you would be a duke.",
-            "I could steer better using only panic and butt friction.",
-            "That was the gaming equivalent of eating soup with a fork.",
-            "I hope you are proud. The wall certainly is.",
-            "You turned a snowy slope into a crime scene for common sense.",
-            "At this point I trust gravity more than you, and gravity is trying to kill me.",
-            "Next time, give the controls to someone with a pulse and a plan.",
-            "This ruined my makeup.",
-            "The wall didn't give way. But my nose did.",
-            "I wanted a finish line, not a facial reconstruction.",
-            "Some players chase glory. You chased geology.",
-            "The mountain called. It wants its wall back, with fewer princess dents.",
-            "Your sense of direction has declared war on survival.",
-            "That was less skiing and more aggressive wall appreciation.",
-            "I am beginning to understand why helmets were invented.",
-            "Did the path move, or did your brain simply resign?",
-            "Beautiful impact. Shame about everything before it.",
-            "You have the survival instincts of decorative pudding.",
-            "I requested elegance, not a full-body argument with stone.",
-            "Even the snow is embarrassed to be part of this.",
-            "The royal chiropractor just bought a second castle.",
-            "You did not miss the turn. You divorced it.",
-            "That was a bold interpretation of navigation.",
-            "Please tell me the controller is haunted. I need hope.",
-            "My bones now know more about this wall than the architect did.",
-            "The kingdom thanks you for your service to masonry.",
-            "I have seen avalanches with better self-preservation.",
-            "That corner was optional only if breathing was optional.",
-            "Next time try steering before the screaming starts.",
-            "If walls could laugh, this one would need medical assistance.",
-            "I admire your commitment to being wrong at high speed.",
-            "The path was wide, white, and friendly. Naturally, you attacked a wall.",
-            "You have the reflexes of a sleepy cabbage.",
-            "I am not sure what died first, my dignity or your strategy.",
-            "That crash had all the grace of a piano falling down stairs.",
-            "You aimed for victory and hit infrastructure.",
-            "The wall and I are now on first name terms, thanks to your stupidity.",
-            "I asked for downhill momentum, not a brick interview.",
-            "The wall did nothing wrong. You, however, did everything wrong.",
-            "The good news is we stopped. The bad news is how.",
-            "I trusted you with one princess and one slope. Somehow both are worse now.",
-            "Was the goal survival, or were we collecting bruises?",
-            "That was a direct deposit into the bank of pain.",
-            "I have more faith in blindfolded furniture.",
-            "Next time, let the mountain play. It cannot do worse.",
-            "Is that your idea of fun? Bashing Princess' head full speed into a wall?",
-            "Wonderful. You painted the snow with my face.",
-            "The wall asked for a kiss. You gave it my skull.",
-            "I have seen smarter steering from a sausage.",
-            "Congratulations, you turned me into princess flavored jam.",
-            "That corner was so easy it came with instructions, and you still ate the wall.",
-            "My nose is now doing modern art on the snow.",
-            "You have the tactical awareness of a boiled potato.",
-            "Bloody brilliant. Mostly bloody.",
-            "The wall wanted tribute, so you paid in royal cartilage.",
-            "I am leaking dignity, and possibly blood.",
-            "You just gave the mountain a fresh coat of princess.",
-            "I hope you enjoyed that, because my spleen just rage quit.",
-            "That impact sounded expensive and stupid, mostly stupid.",
-            "My royal butt survived, but my patience died on impact.",
-            "You made the wall blush. With my blood.",
-            "This is why peasants are not allowed near steering decisions.",
-            "You missed the gap so hard the gap is filing a complaint.",
-            "A turn signal would not help you. A brain signal might.",
-            "The wall has more personality than your route planning.",
-            "I came, I slid, I bled, I questioned your existence.",
-            "That was a perfect landing, if the target was internal bleeding.",
-            "You have weaponized dumb.",
-            "This is not a ski game anymore. It is a princess disposal simulator.",
-            "Your steering is a crime against geometry.",
-            "My royal bloodline nearly ended because you feared turning.",
-            "The wall did not hit me. Your incompetence did.",
-            "If stupidity were a slope, you would be world champion.",
-            "That was a headbutt with extra steps.",
-            "I asked for control, not a crimson snow angel.",
-            "You just invented the blood slalom. Please uninvent it.",
-            "Even the rocks are whispering, what an idiot.",
-            "My face has merged with local architecture.",
-            "You make gravity look professional.",
-            "The wall took my health bar and your reputation.",
-            "I should have hired a drunk mule. At least it would zigzag.",
-            "My royal insurance does not cover players with soup for brains.",
-            "That was not wall damage. That was princess puree.",
-            "If bad steering were a kingdom, you would be its idiot king.",
-            "I am starting to think the real final boss is your thumb.",
-            "Nice work. The mountain now has a blood stained signature edition.",
-        ];
-        const text = texts.chooseRandom();
-        HERO.speak(text);
-
     },
     finalDeath() {
         for (const L of LIGHTS3D.POOL) {
@@ -321,67 +168,8 @@ const HERO = {
         }, 6000);
 
     },
-    restore() {
-        this.dead = false;
-        this.health = this.maxHealth;
-    },
-    flightOn() {
-
-    },
-    flightOff() {
-
-    },
-    cancelFlight() {
-
-    },
-    updateSunPosition() {
-        const sun = SUN3D.POOL[0];                              //assuming single sun
-        sun.pos = this.player.pos.add(INI.SUN_VECTOR);
-    },
     manage(lapsedTime) {
-        const slideData = this.player.slide(lapsedTime);
-        this.updateGame(slideData);
-        this.updateSunPosition();
-    },
-    updateGame(obj) {
-        if (!obj) return;
-        for (const o in obj) {
-            GAME[o] = obj[o];
-        }
-    },
-    crash(crashSpeed) {
-        const damage = this.calcCrashDamage(crashSpeed);
-        console.warn("crash", crashSpeed, "damage", damage, "x", this.player.pos.x);
-        GAME.realSpeed = 0;
-
-        if (damage > 0) {
-            this.applyDamage(damage);
-            EXPLOSION3D.add(new BloodExplosion(this.player.pos));
-        }
-    },
-    calcCrashDamage(crashSpeed) {
-        let impactFactor = 1.0;                                         //we need to implement wall normals, or maybe not ... fuck it
-        if (crashSpeed < INI.CRASH_SAFE_SPEED) return 0;
-        if (crashSpeed >= INI.CRASH_LETHAL_SPEED) return INI.MAX_DAMAGE;
-        const x = (crashSpeed - INI.CRASH_SAFE_SPEED) / (INI.CRASH_LETHAL_SPEED - INI.CRASH_SAFE_SPEED);
-        const severity = Math.pow(x, INI.CRASH_DAMAGE_POWER);
-        const damage = INI.MAX_DAMAGE * severity * impactFactor;
-        return Math.round(damage);
-    },
-    break() {
-        const pos = this.player.pos.add(new Vector3(-0.03, 0, 0));
-        EXPLOSION3D.add(new SnowCloud(pos));
-    },
-    turn(label, sliding) {
-        if (!sliding) return;
-        const side = label === "Left" ? -1 : 1;
-        const pos = this.player.pos.add(new Vector3(-0.005, 0, 0.1 * side));
-        EXPLOSION3D.add(new SnowCloud(pos));
-    },
-    startRun() {
-        if (GAME.timerRunning) return;
-        GAME.timerRunning = true;
-        GAME.time = new Timer("Main");
+        this.player.continueMove(lapsedTime);
     },
     completeLevel() {
         if (GAME.levelComplete) return;
@@ -471,6 +259,7 @@ const GAME = {
         GAME.prepareForRestart();
         ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         GRID.grid();
+        
 
         if (DEBUG.AUTO_TEST) {
             return DEBUG.automaticTests();
@@ -517,21 +306,17 @@ const GAME = {
     initLevel(level) {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon();
-        //WebGL.setContext('webgl');
         this.buildWorld(level);
 
         const map = MAP.main.map;
         const start_dir = map.startPosition.vector;
         const start_grid = Grid.toClass(map.startPosition.grid);
 
-        console.log("start", start_grid, start_dir, "map", map);
-
         HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
         console.log("HERO.player", HERO.player);
 
         GAME.setCameraView();
         GAME.setWorld();
-        //throw "dev";
     },
     setWorld() {
         WebGL.init2D('webgl');
@@ -587,6 +372,7 @@ const GAME = {
     drawFirstFrame(level) {
         if (DEBUG.VERBOSE) console.log("drawing first frame");
         TITLE.firstFrame();
+        GRID.paintCoord("coord", MAP.main.map);
         if (DEBUG._2D_display) {
             ENGINE.resizeBOX("LEVEL", MAP[level].pw, MAP[level].ph);
             ENGINE.BLOCKGRID.configure("pacgrid", "#FFF", "#000");
@@ -598,13 +384,12 @@ const GAME = {
     run(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
         const date = Date.now();
-        //HERO.player.animateAction();
-        EXPLOSION3D.manage(date);
-        //GAME.respond(lapsedTime);
+        //EXPLOSION3D.manage(date);
+        GAME.respond(lapsedTime);
         ENGINE.TIMERS.update();
-        //HERO.manage(lapsedTime);
+        HERO.manage(lapsedTime);
         GAME.frameDraw(lapsedTime);
-        //HERO.concludeAction();
+        HERO.concludeAction();
         if (HERO.dead) IAM.checkIfProcessesComplete([EXPLOSION3D], HERO.death);
         if (GAME.completed) GAME.won();
     },

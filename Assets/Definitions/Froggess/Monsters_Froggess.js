@@ -17,10 +17,10 @@ const HERO_TYPE = {
     Froggess: {
         name: "Froggess",
         asset: "Froggess",
-        moveSpeed: 1.0,
+        speed: 4.0 * 64,
         w: 64,
         h: 54,
-        fps: 6,
+        fps: 30,
     }
 };
 

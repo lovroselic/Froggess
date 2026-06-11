@@ -2771,23 +2771,76 @@ class $2D_Sprite {
 class $2D_Entity {
     constructor(grid, dir, type, GA) {
         this.sprite = new $2D_Sprite(grid, dir, type);
+        this.actor = this.sprite;                               // legacy compatibility, redundant already?
         this.moveState = new MoveState(grid, dir, GA);
+        this.GA = GA;
+        if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
     }
     draw(gl, program, spriteQuad) {
         const texture = this.sprite.getSpriteTexture();
         const modelMatrix = this.sprite.updateModelMatrix();
         gl.uniformMatrix4fv(program.uniformLocations.modelMatrix, false, modelMatrix);
         gl.uniform4fv(program.uniformLocations.tint, this.sprite.tint);
-        gl.uniform4fv(program.uniformLocations.uvRect, [0, 0, 1, 1]);                           //frames are presplit, keep this for future compatibility, texture atlases
+        gl.uniform4fv(program.uniformLocations.uvRect, [0, 0, 1, 1]);                           // frames are presplit, keep this for future compatibility, like texture atlases
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.drawArrays(gl.TRIANGLES, 0, spriteQuad.count);
     }
+    startMoving(dir) {
+        this.sprite.rotationFromDir(dir);
+        this.moveState.next(dir);
+    }
+    continueMove(lapsedTime) {
+        if (!this.moveState.moving) return;
+        GRID.translateMove2D(this, lapsedTime);
+    }
 }
 
 class $2D_player extends $2D_Entity {
-    constructor(grid, dir, type, GA) {
+    constructor(grid, dir, type, GA, parent = HERO) {
         super(grid, dir, type, GA);
+        this.parent = parent;
+    }
+    move(dir) {
+        const nextGrid = this.moveState.startGrid.add(dir);
+        console.warn("try moving dir", dir, "oob", this.GA.isOutOfBounds(nextGrid), "wall", this.GA.isWall(nextGrid));
+        if (this.GA.isOutOfBounds(nextGrid)) return;
+        if (this.GA.isWall(nextGrid)) return;
+
+        //allowed moves so far: EMPTY, HOLE
+        const nextValue = this.GA.getValue(nextGrid);
+        console.log(".player start moving", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
+        this.startMoving(dir);
+    }
+    respond(lapsedTime) {
+        const map = ENGINE.GAME.keymap;
+
+        if (this.parent.dead) return;
+        if (this.moveState.moving) return;
+
+        if (map[ENGINE.KEY.map.left]) {
+            ENGINE.GAME.keymap[ENGINE.KEY.map.left] = false;
+            this.move(LEFT);
+            return;
+        }
+
+        if (map[ENGINE.KEY.map.right]) {
+            ENGINE.GAME.keymap[ENGINE.KEY.map.right] = false;
+            this.move(RIGHT);
+            return;
+        }
+
+        if (map[ENGINE.KEY.map.up]) {
+            ENGINE.GAME.keymap[ENGINE.KEY.map.up] = false;
+            this.move(UP);
+            return;
+        }
+
+        if (map[ENGINE.KEY.map.down]) {
+            ENGINE.GAME.keymap[ENGINE.KEY.map.down] = false;
+            this.move(DOWN);
+            return;
+        }
     }
 }
 

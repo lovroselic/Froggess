@@ -281,6 +281,25 @@ const GRID = {
     },
 
     /**
+     * modern 2D version, used with openGl, 
+     * sprite is used instead of actor, but actor used for legacy readability
+     * VIEWPORT is handled elsewhere
+     * gridArray not used, assuming i will never again do a pacman clonse
+     */
+    translateMove2D(entity, lapsedTime, onFinish = null, animate = true) {
+        let length = (lapsedTime / 1000) * entity.speed;
+        entity.actor.pos = entity.actor.pos.translate(entity.actor.dir, length);
+        if (animate) entity.actor.updateAnimation(lapsedTime);
+        entity.moveState.homeGrid = GRID.pointToGrid(entity.actor.pos);
+        entity.moveState.pos = entity.actor.pos.toTopLeft().to_FP_Grid();
+        const overallDistance = entity.moveState.pos.distance(entity.moveState.startGrid);
+        if (overallDistance >= 1.0) {
+            entity.moveState.moving = false;
+            if (onFinish) onFinish.call();
+        }
+    },
+
+    /**
      * does not use actor, only moveState.pos (FP_Grid)
      * no animation, no viewport
      * revertX = 1, revertY = 1; change to -1 to revert axis

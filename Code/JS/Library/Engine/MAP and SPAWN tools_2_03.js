@@ -22,6 +22,12 @@ const MAP_TOOLS = {
         VERBOSE: false,
         DIM_3D: true, //if false reverts to 2D
     },
+    use2D() {
+        MAP_TOOLS.INI.DIM_3D = false;
+    },
+    use3D() {
+        MAP_TOOLS.INI.DIM_3D = false;
+    },
     manageMAP(level) {
         if (MAP[level].map.spawnDelay < 0) return;
         if (MAP[level].map.stopSpawning) return;

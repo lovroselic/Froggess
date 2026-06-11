@@ -669,6 +669,13 @@ class MasterGridClass {
     manhattanDistance(grid) {
         return Math.abs(this.x - grid.x) + Math.abs(this.y - grid.y);
     }
+    distance(vector) {
+        return Math.abs(this.x - vector.x) + Math.abs(this.y - vector.y);
+    }
+    distanceDiagonal(vector) {
+        let distance = (this.x - vector.x) ** 2 + (this.y - vector.y) ** 2;
+        return Math.sqrt(distance) | 0;
+    }
 }
 
 class Grid extends MasterGridClass {
@@ -704,13 +711,6 @@ class Grid extends MasterGridClass {
     }
     same(vector) {
         return (this.x === vector.x && this.y === vector.y);
-    }
-    distance(vector) {
-        return Math.abs(this.x - vector.x) + Math.abs(this.y - vector.y);
-    }
-    distanceDiagonal(vector) {
-        let distance = (this.x - vector.x) ** 2 + (this.y - vector.y) ** 2;
-        return Math.sqrt(distance) | 0;
     }
     directionSolutions(grid) {
         let solutions = [];
@@ -799,6 +799,11 @@ class Point extends MasterGridClass {
     }
     add(vector, len = 1) {
         return new Point(this.x + vector.x * len, this.y + vector.y * len);
+    }
+    to_FP_Grid(GS = ENGINE.INI.GRIDPIX) {
+        let x = this.x / GS;
+        let y = this.y / GS;
+        return new FP_Grid(x, y);
     }
 }
 
