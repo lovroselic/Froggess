@@ -47,7 +47,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.2.2",
+    VERSION: "0.3.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -258,8 +258,7 @@ const GAME = {
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
         ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
-        GRID.grid();
-        
+        if (DEBUG._2D_display) GRID.grid();
 
         if (DEBUG.AUTO_TEST) {
             return DEBUG.automaticTests();
@@ -284,11 +283,9 @@ const GAME = {
     },
     levelStart() {
         console.log("starting level", GAME.level);
-
         this.levelComplete = false;
         if (GAME.time) GAME.time.unregister();
         GAME.time = null;
-
         GAME.initLevel(GAME.level);
         GAME.continueLevel();
     },
@@ -372,14 +369,8 @@ const GAME = {
     drawFirstFrame(level) {
         if (DEBUG.VERBOSE) console.log("drawing first frame");
         TITLE.firstFrame();
-        GRID.paintCoord("coord", MAP.main.map);
-        if (DEBUG._2D_display) {
-            ENGINE.resizeBOX("LEVEL", MAP[level].pw, MAP[level].ph);
-            ENGINE.BLOCKGRID.configure("pacgrid", "#FFF", "#000");
-            ENGINE.BLOCKGRID3D.draw(MAP[GAME.level].map, HERO.player.depth);
-            GRID.grid();
-            GRID.paintCoord3D("coord", MAP[level].map, HERO.player.depth);
-        }
+        if (DEBUG._2D_display) GRID.paintCoord("coord", MAP.main.map);
+
     },
     run(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
@@ -394,24 +385,11 @@ const GAME = {
         if (GAME.completed) GAME.won();
     },
     frameDraw(lapsedTime) {
-        if (DEBUG._2D_display) {
-            GAME.drawPlayer();
-        }
         WebGL.render2DScene(MAP[GAME.level].map);
 
         if (DEBUG.FPS) {
             GAME.FPS(lapsedTime);
         }
-        if (DEBUG._2D_display) {
-            const map = MAP[GAME.level].map;
-            ENGINE.BLOCKGRID3D.draw(map, HERO.player.depth);
-            GRID.paintCoord3D("coord", MAP[GAME.level].map, HERO.player.depth);
-            WebGL.visualizeTexture3DSlice(map.occlusionMap.texture, map.zMap1.xSize, map.zMap1.ySize, 1, 0, LAYER.debug); //debug
-        }
-    },
-    drawPlayer() {
-        ENGINE.clearLayer(ENGINE.VECTOR2D.layerString);
-        ENGINE.VECTOR2D.draw(HERO.player);
     },
     respond(lapsedTime) {
         if (HERO.dead) return;
