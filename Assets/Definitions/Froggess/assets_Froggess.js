@@ -26,7 +26,7 @@ LoadTextures = [
     //{ srcName: "Shading/Fire_color_map_512.webp", name: "Fire_color_map" },
     //{ srcName: "Shading/fire_noise_512.webp", name: "Fire_noise" },
 
-    
+
 
     //title
     { srcName: "Title/Froggess_title_768.webp", name: "Title" },
@@ -36,7 +36,7 @@ LoadTextures = [
     //{ srcName: "ObjectTextures/RedLiquid.jpg", name: "RedLiquid" },
     //{ srcName: "ObjectTextures/SnowTexture.webp", name: "SnowTexture" },
 
-    
+
 
 ];
 
@@ -61,11 +61,12 @@ LoadShaders = [
 //LoadObjects = [  ];
 
 LoadModels = [
-   
+
 ];
 
 LoadSprites = [
-   
+    //UI
+    { srcName: "UI/FroggessLife.png", name: "Lives" },
 ];
 
 console.log("%cAssets for Froggess ready.", "color: orange");

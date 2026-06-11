@@ -27,7 +27,6 @@ const DEBUG = {
     INVINCIBLE: false,
     keys: false,
     max17: false,
-
 };
 
 const INI = {
@@ -39,7 +38,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.3.1",
+    VERSION: "0.3.2",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -69,8 +68,6 @@ const PRG = {
         $("#lib_version").html(LIB.VERSION);
         $("#webgl_version").html(WebGL.VERSION);
         $("#maptools_version").html(MAP_TOOLS.VERSION);
-        //$("#speech_version").html(SPEECH.VERSION);
-
 
         $("#toggleHelp").click(function () {
             $("#help").toggle(400);
@@ -78,7 +75,9 @@ const PRG = {
         $("#toggleAbout").click(function () {
             $("#about").toggle(400);
         });
-
+        $("#toggleVersion").click(function () {
+            $("#debug").toggle(400);
+        });
 
         //boxes
         ENGINE.gameWIDTH = 960;
@@ -92,17 +91,17 @@ const PRG = {
 
         $("#bottom").css("margin-top", ENGINE.gameHEIGHT + ENGINE.titleHEIGHT + ENGINE.bottomHEIGHT);
         $(ENGINE.gameWindowId).width(ENGINE.gameWIDTH + 2 * ENGINE.sideWIDTH + 4);
-        ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title", "score", "level", "hiscore"], null);
+        ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title", "score", "level", "hiscore", "time"], null);
         ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback",], "side");
         ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "coord", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
         ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback"], "fside");
-        ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle", "lives", "time"], null);
+        ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle", "lives",], null);
 
         MAP_TOOLS.use2D();
 
-        if (DEBUG._2D_display) {
+        /*if (DEBUG._2D_display) {
             ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", "player", "debug"], null);
-        }
+        }*/
 
 
         /** dev settings */
@@ -134,6 +133,9 @@ const HERO = {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
     },
     die() {
+        console.error("HERO.die");
+        throw "hero die";
+
         if (HERO.dead) return;
         HERO.dead = true;
     },
@@ -260,25 +262,14 @@ const GAME = {
         GAME.levelStart();
     },
     WebGL_settings() {
-        WebGL.setAmbientStrength(1);
-        WebGL.setDiffuseStrength(0.5);
         WebGL.INI.BACKGROUND_ALPHA = 0.0;
-        WebGL.USE_SHADOW = false;
-        WebGL.USE_INTERACTION = false;
-        WebGL.INI.HERO_HEIGHT = INI.HERO_HEIGHT;
-        WebGL.FIRST_PERSON_DUAL_DISPLAY = true;
-        WebGL.NO_TOP_CEILING = true;
-        WebGL.VIEWS_ALLOWED = new Set([3]);
-        WebGL.GAME.setViewButtons();
-        WebGL.CONFIG.setMovementMode("surface");
-        WebGL.INI.SCALE_DECAL = 0.45;
-        WebGL.INI.ADDITIONAL_TOP_OFFSET = 0.3;
     },
     levelStart() {
         console.log("starting level", GAME.level);
         this.levelComplete = false;
         if (GAME.time) GAME.time.unregister();
-        GAME.time = null;
+        //GAME.time = null;
+        GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
         GAME.initLevel(GAME.level);
         GAME.continueLevel();
     },
@@ -379,7 +370,7 @@ const GAME = {
     },
     frameDraw(lapsedTime) {
         WebGL.render2DScene(MAP[GAME.level].map);
-
+        TITLE.time();
         if (DEBUG.FPS) {
             GAME.FPS(lapsedTime);
         }
@@ -470,9 +461,6 @@ const GAME = {
 };
 
 const TITLE = {
-    stack: {
-
-    },
     startTitle() {
         if (DEBUG.VERBOSE) console.log("TITLE started");
         //if (AUDIO.Title) AUDIO.Title.play(); //dev
@@ -593,6 +581,25 @@ const TITLE = {
         CTX.shadowBlur = 3;
         CTX.fillText(PRG.NAME, x, y);
     },
+    smalTitle() {
+        const CTX = LAYER.title;
+        const fs = 20;
+        CTX.font = fs + "px Moria";
+        CTX.textAlign = "center";
+        let txt = CTX.measureText(PRG.NAME);
+        let x = ENGINE.titleWIDTH / 2;
+        let y = fs + 2;
+        let gx = x - txt.width / 2;
+        let gy = y - fs;
+        let grad = this.makeGrad(CTX, gx, gy + 10, gx, gy + fs);
+        CTX.fillStyle = grad;
+        GAME.grad = grad;
+        CTX.shadowColor = "#666666";
+        CTX.shadowOffsetX = 1;
+        CTX.shadowOffsetY = 1;
+        CTX.shadowBlur = 1;
+        CTX.fillText(PRG.NAME, x, y);
+    },
     drawButtons() {
         ENGINE.clearLayer("button");
         FORM.BUTTON.POOL.clear();
@@ -619,6 +626,9 @@ const TITLE = {
         TITLE.score();
         TITLE.stage();
         TITLE.hiscore();
+        TITLE.lives();
+        TITLE.time();
+        TITLE.smalTitle();
     },
     music() {
         AUDIO.Title.play();
@@ -626,21 +636,17 @@ const TITLE = {
     time() {
         const CTX = LAYER.time;
         ENGINE.clearLayer("time");
-        const fs = 36;
-        CTX.font = fs + "px DigitalNumbers";
-        CTX.textAlign = "center";
-        let x = 1.5 * ENGINE.sideWIDTH + ENGINE.gameWIDTH;
-        let y = ENGINE.titleHEIGHT / 2 + fs / 4;
-        CTX.fillStyle = "#0D0";
-        CTX.shadowColor = "#666";
-        CTX.shadowOffsetX = 1;
-        CTX.shadowOffsetY = 1;
-        CTX.shadowBlur = 1;
-        let text = "0:00:00";
-        if (GAME.time) text = Timer.MSH_String(GAME.time.time());
-        CTX.fillText(text, x, y);
+        const x = 64;
+        const h = 12;
+        const y = ENGINE.titleHEIGHT - h - 1 - 16;
+        const w = ENGINE.gameWIDTH;
+        const remaining = GAME.time.remains();
+        const fraction = remaining / INI.TIMEOUT;
+        //console.log("remaining", remaining, "fraction", fraction);
+        ENGINE.percentBar(fraction, y, CTX, w, ["green", "yellow", "red"], h, x, 0);
     },
     score() {
+        ENGINE.clearLayer("score");
         const CTX = LAYER.score;
         const fs = 18;
         const x = 64;
@@ -655,6 +661,7 @@ const TITLE = {
         CTX.fillText(`Score: ${GAME.score.toString().padStart(6, "0")}`, x, y);
     },
     stage() {
+        ENGINE.clearLayer("level");
         const CTX = LAYER.level;
         const fs = 18;
         const x = 300 + 32;
@@ -669,9 +676,10 @@ const TITLE = {
         CTX.fillText(`Stage: ${GAME.level.toString().padStart(2, "0")}`, x, y);
     },
     hiscore() {
+        ENGINE.clearLayer("hiscore");
         const CTX = LAYER.hiscore;
         const fs = 18;
-        const x =  ENGINE.titleWIDTH = ENGINE.gameWIDTH + INI.SCREEN_BORDER;;
+        const x = ENGINE.titleWIDTH = ENGINE.gameWIDTH + INI.SCREEN_BORDER;;
         const y = ENGINE.titleHEIGHT / 2 + fs / 4;
         CTX.font = fs + "px Moria";
         CTX.textAlign = "right";
@@ -690,7 +698,16 @@ const TITLE = {
         const text = "HISCORE: " + SCORE.SCORE.value[0].toString().padStart(6, "0") + " by " + HS;
         CTX.fillText(text, x, y);
     },
-
+    lives() {
+        ENGINE.clearLayer("lives");
+        const CTX = LAYER.lives;
+        const cX = ENGINE.bottomWIDTH / 2;
+        const y = ENGINE.bottomHEIGHT / 2;
+        const spread = ENGINE.spreadAroundCenter(GAME.lives - 1, cX, 72);
+        for (let x of spread) {
+            ENGINE.spriteDraw("lives", x, y, SPRITE.Lives);
+        }
+    }
 };
 
 // -- main --

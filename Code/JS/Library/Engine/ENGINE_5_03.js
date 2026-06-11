@@ -592,13 +592,13 @@ const ENGINE = {
         CTX.fillText(`${text}: ${percent}%`, ENGINE.LOAD_W * 0.1, ENGINE.LOAD_H * 0.62);
         return;
     },
-    percentBar(percent, y, CTX, panelSize, colors, H) {
-        let pad = panelSize / 12;
+    percentBar(percent, y, CTX, panelSize, colors, H, xoff = 0, pad) {
+        if (pad === undefined) pad = panelSize / 12;
         CTX.beginPath();
         CTX.lineWidth = "1";
         CTX.strokeStyle = colors[0];
         var Width = panelSize - 2 * pad;
-        CTX.rect(pad, y, Width, H);
+        CTX.rect(pad + xoff, y, Width, H);
         CTX.closePath();
         CTX.stroke();
         CTX.shadowColor = "transparent";
@@ -612,7 +612,7 @@ const ENGINE = {
         } else if (percent <= 0.1) {
             CTX.fillStyle = colors[2];
         }
-        CTX.fillRect(pad + 1, y + 1, Math.max(0, Math.round(Width * percent) - 2), H - 2);
+        CTX.fillRect(pad + 1 + xoff, y + 1, Math.max(0, Math.round(Width * percent) - 2), H - 2);
     },
     statusBar(CTX, x, y, w, h, value, max, color, annotate = true) {
         CTX.save();

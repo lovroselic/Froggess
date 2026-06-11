@@ -1573,13 +1573,13 @@ const WebGL = {
     HTML: {
         buttons: `
         <div>
-            <input type='button' id='p1' value='First person view [1]' disabled="disabled">
-            <input type='button' id='p2' value='Third person, low angle view [2]' disabled="disabled">
-            <input type='button' id='p3' value='Third person view [3]' disabled="disabled">
-            <input type='button' id='p4' value='Axonometric view [4]' disabled="disabled">
-            <input type='button' id='pt5' value='Top down view [5]' disabled="disabled">
-            <input type='button' id='pt6' value='Side view [6]' disabled="disabled">
-            <input type='button' id='pt7' value='Overhead view [7]' disabled="disabled">
+            <input type='button' id='p1' class='webgl-view' value='First person view [1]' disabled="disabled">
+            <input type='button' id='p2' class='webgl-view' value='Third person, low angle view [2]' disabled="disabled">
+            <input type='button' id='p3' class='webgl-view' value='Third person view [3]' disabled="disabled">
+            <input type='button' id='p4' class='webgl-view' value='Axonometric view [4]' disabled="disabled">
+            <input type='button' id='pt5' class='webgl-view' value='Top down view [5]' disabled="disabled">
+            <input type='button' id='pt6' class='webgl-view' value='Side view [6]' disabled="disabled">
+            <input type='button' id='pt7' class='webgl-view' value='Overhead view [7]' disabled="disabled">
         </div>
         `,
         addButtons() {
