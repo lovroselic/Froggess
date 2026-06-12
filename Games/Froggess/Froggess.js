@@ -20,10 +20,9 @@ retests:
 
 const DEBUG = {
     SETTING: true,
-    AUTO_TEST: false,
     FPS: true,
     VERBOSE: true,
-    _2D_display: false,
+    _2D_display: true,
     INVINCIBLE: false,
     keys: false,
     max17: false,
@@ -35,10 +34,12 @@ const INI = {
     HERO_HEIGHT: 0.15,
     WINDOW_SCALE: 0.90,
     TIMEOUT: 60,
+    MAX_ROW: 11,
+    SCORE_ROW: 10,
 };
 
 const PRG = {
-    VERSION: "0.4.0",
+    VERSION: "0.4.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -123,13 +124,13 @@ const HERO = {
     construct() {
         this.player = null;
         this.dead = false;
+        this.row = INI.MAX_ROW;
     },
     concludeAction() {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
     },
     die() {
         console.error("HERO.die");
-
         if (HERO.dead) return;
         HERO.dead = true;
     },
@@ -139,15 +140,13 @@ const HERO = {
         $(AUDIO.Death).one("ended", HERO.finalDeath);
         AUDIO.Death.play();
         GAME.lives--;
-        //TITLE.lives();
     },
     finalDeath() {
         console.error("HERO.finalDeath");
         if (GAME.lives > 0) return GAME.levelStart();
-
-        //checkscore
+        GAME.checkScore();
+        TITLE.hiscore();
         TITLE.startTitle();
-
     },
     manage(lapsedTime) {
         this.player.continueMove(lapsedTime);
@@ -210,6 +209,29 @@ const HERO = {
         HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
         console.log("HERO.player", HERO.player);
+    },
+    handleHoleMove() {
+        console.warn("handleHoleMove");
+
+        //check survival ..
+
+        this.checkForwardProgress();
+    },
+    handleEmptyMove() {
+        console.warn("handleEmptyMove");
+        this.checkForwardProgress();
+    },
+    handleReservedMove() {
+        console.warn("handleReservedMove");
+
+    },
+    checkForwardProgress() {
+        const currentRow = this.player.moveState.startGrid.y;
+        if (currentRow < this.row) {
+            this.row = currentRow;
+            GAME.score += INI.SCORE_ROW;
+            TITLE.score();
+        }
     }
 };
 
@@ -238,21 +260,15 @@ const GAME = {
         ENGINE.watchVisibility(ENGINE.GAME.lostFocus);
         ENGINE.GAME.setGameLoop(GAME.run);
         ENGINE.GAME.start(16);
-
+        GAME.extraLife = SCORE.extraLife.clone();
         GAME.level = 1;
         GAME.lives = 3; //3
         GAME.score = 0;
 
-
-        //ENGINE.VECTOR2D.configure("player");
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
         ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         if (DEBUG._2D_display) GRID.grid();
-
-        if (DEBUG.AUTO_TEST) {
-            return DEBUG.automaticTests();
-        }
 
         GAME.levelStart();
     },
@@ -342,9 +358,8 @@ const GAME = {
     },
     drawFirstFrame(level) {
         if (DEBUG.VERBOSE) console.log("drawing first frame");
-        TITLE.firstFrame();
         if (DEBUG._2D_display) GRID.paintCoord("coord", MAP.main.map);
-
+        TITLE.firstFrame();
     },
     run(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
@@ -410,33 +425,6 @@ const GAME = {
         GAME.fps.update(fps);
         CTX.fillText(GAME.fps.getFps(), 5, 10);
     },
-    lifeLostRun(lapsedTime) {
-        if (ENGINE.GAME.stopAnimation) return;
-        if (ENGINE.GAME.keymap[ENGINE.KEY.map.enter]) {
-            ENGINE.GAME.ANIMATION.waitThen(GAME.resurect);
-        }
-        const date = Date.now();
-        //WebGL.GAME.setFirstPerson();
-        FIRE3D.manage(date);
-        EXPLOSION3D.manage(date);
-        ENTITY3D.manage(lapsedTime, date, [HERO.invisible, HERO.dead]);
-        GAME.lifeLostFrameDraw(lapsedTime);
-    },
-    lifeLostFrameDraw(lapsedTime) {
-        if (DEBUG._2D_display) {
-            GAME.drawPlayer();
-        }
-        WebGL.renderScene(MAP[GAME.level].map);
-
-        if (DEBUG.FPS) {
-            GAME.FPS(lapsedTime);
-        }
-        if (DEBUG._2D_display) {
-            ENGINE.BLOCKGRID.draw(MAP[GAME.level].map);
-            MISSILE3D.draw();
-            ENTITY3D.drawVector2D();
-        }
-    },
     gameOverRun(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
         if (ENGINE.GAME.keymap[ENGINE.KEY.map.enter]) {
@@ -448,7 +436,10 @@ const GAME = {
         ENTITY3D.manage(lapsedTime, date, [HERO.invisible, HERO.dead]);
         GAME.lifeLostFrameDraw(lapsedTime);
     },
-    over() { }
+    checkScore() {
+        SCORE.checkScore(GAME.score);
+        SCORE.hiScore();
+    },
 };
 
 const TITLE = {
@@ -487,7 +478,6 @@ const TITLE = {
         const CTX = LAYER.title;
         CTX.fillStyle = "#000";
         CTX.roundRectLegacy(0, 0, ENGINE.titleWIDTH, ENGINE.titleHEIGHT, { upperLeft: 20, upperRight: 20, lowerLeft: 0, lowerRight: 0 }, true, true);
-        console.warn(ENGINE.titleWIDTH, "ENGINE.titleWIDTH");
     },
     bottomBackground() {
         const CTX = LAYER.bottom;
@@ -650,6 +640,12 @@ const TITLE = {
         CTX.shadowOffsetY = 1;
         CTX.shadowBlur = 1;
         CTX.fillText(`Score: ${GAME.score.toString().padStart(6, "0")}`, x, y);
+        if (GAME.score >= GAME.extraLife[0]) {
+            GAME.lives++;
+            GAME.extraLife.shift();
+            TITLE.lives();
+            AUDIO.ExtraLife.play();
+        }
     },
     stage() {
         ENGINE.clearLayer("level");

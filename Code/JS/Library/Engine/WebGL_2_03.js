@@ -2813,7 +2813,7 @@ class $2D_player extends $2D_Entity {
 
         //allowed moves so far: EMPTY, HOLE
         const nextValue = this.GA.getValue(nextGrid);
-        console.log(".player start moving dir", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
+        //console.log(".player start moving dir", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
         this.startMoving(dir);
     }
     respond(lapsedTime) {
@@ -2853,6 +2853,28 @@ class $2D_player extends $2D_Entity {
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
         console.warn("checking end move, this.moveState.startGrid", this.moveState.startGrid, endValue, REVERSED_MAPDICT[endValue]);
+        switch (endValue) {
+            case MAPDICT.HOLE:
+                return this.handleHoleMove();
+                break;
+            case MAPDICT.EMPTY:
+                return this.handleEmptyMove();
+                break;
+            case MAPDICT.RESERVED:
+                return this.handleReservedMove();
+                break;
+            default:
+                throw new Error("unmanaged end move", REVERSED_MAPDICT[endValue]);
+        }
+    }
+    handleHoleMove() {
+        if (this.parent.handleHoleMove) this.parent.handleHoleMove();
+    }
+    handleEmptyMove() {
+        if (this.parent.handleEmptyMove) this.parent.handleEmptyMove();
+    }
+    handleReservedMove() {
+        if (this.parent.handleReservedMove) this.parent.handleReservedMove();
     }
     addDeathTexture(img) {
         this.deathTexture = WebGL.createTexture(img);

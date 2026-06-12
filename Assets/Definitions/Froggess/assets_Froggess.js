@@ -41,7 +41,7 @@ LoadTextures = [
 LoadAudio = [
     { srcName: "Acceptance - LaughingSkull.mp3", name: "Title" },
     { srcName: "death.mp3", name: "Death" },
-
+    { srcName: "ExtraLife.mp3", name: "ExtraLife" },
     //action sounds
 
 
