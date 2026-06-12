@@ -38,7 +38,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.3.2",
+    VERSION: "0.4.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -99,11 +99,6 @@ const PRG = {
 
         MAP_TOOLS.use2D();
 
-        /*if (DEBUG._2D_display) {
-            ENGINE.addBOX("LEVEL", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["pacgrid", "player", "debug"], null);
-        }*/
-
-
         /** dev settings */
         if (DEBUG.VERBOSE) {
             WebGL.VERBOSE = true;
@@ -134,32 +129,24 @@ const HERO = {
     },
     die() {
         console.error("HERO.die");
-        throw "hero die";
 
         if (HERO.dead) return;
         HERO.dead = true;
     },
     death() {
-        $(AUDIO.PrincessScream).one("ended", HERO.endSpeech);
-        AUDIO.PrincessScream.play();
-        HERO.finalDeath();
+        console.error("HERO.death");
+        ENGINE.GAME.ANIMATION.stop();
+        $(AUDIO.Death).one("ended", HERO.finalDeath);
+        AUDIO.Death.play();
+        GAME.lives--;
+        //TITLE.lives();
     },
     finalDeath() {
-        for (const L of LIGHTS3D.POOL) {
-            L.lightColor = Array(0, 0, 0);
-        }
+        console.error("HERO.finalDeath");
+        if (GAME.lives > 0) return GAME.levelStart();
 
-        let dir = HERO.player.camera.dir.reverse2D();
-        const entity = new $3D_Entity(Vector3.to_FP_Grid3D(HERO.player.pos), MONSTER_TYPE.Skeleton, Vector3.to_Vector3D(dir));
-        ENTITY3D.add(entity);
-        ENGINE.GAME.ANIMATION.stop();
-
-        setTimeout(function () {
-            ENGINE.TEXT.centeredText("Rest In Peace", ENGINE.gameWIDTH, ENGINE.gameHEIGHT / 2);
-            ENGINE.TEXT.centeredText("(ENTER)", ENGINE.gameWIDTH, ENGINE.gameHEIGHT / 2 + ENGINE.TEXT.RD.fs * 1.2);
-            ENGINE.GAME.ANIMATION.resetTimer();
-            ENGINE.GAME.ANIMATION.next(GAME.gameOverRun);
-        }, 6000);
+        //checkscore
+        TITLE.startTitle();
 
     },
     manage(lapsedTime) {
@@ -215,6 +202,14 @@ const HERO = {
         $("#FORM").remove();
         GAME.level = Math.min(INI.MAX_LEVEL, ++GAME.level);
         GAME.start();
+    },
+    playerSetUp() {
+        const map = MAP.main.map;
+        const start_dir = map.startPosition.vector;
+        const start_grid = Grid.toClass(map.startPosition.grid);
+        HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
+        HERO.player.addDeathTexture(SPRITE.DeadFrog);
+        console.log("HERO.player", HERO.player);
     }
 };
 
@@ -245,11 +240,11 @@ const GAME = {
         ENGINE.GAME.start(16);
 
         GAME.level = 1;
-        GAME.lives = 3;
+        GAME.lives = 3; //3
         GAME.score = 0;
 
-        HERO.construct();
-        ENGINE.VECTOR2D.configure("player");
+
+        //ENGINE.VECTOR2D.configure("player");
         GAME.fps = new FPS_short_term_measurement(300);
         GAME.prepareForRestart();
         ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
@@ -266,10 +261,12 @@ const GAME = {
     },
     levelStart() {
         console.log("starting level", GAME.level);
+        HERO.construct();
         this.levelComplete = false;
         if (GAME.time) GAME.time.unregister();
         //GAME.time = null;
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
+        //GAME.time = new CountDown("LevelTime", 2, HERO.die);
         GAME.initLevel(GAME.level);
         GAME.continueLevel();
     },
@@ -288,14 +285,7 @@ const GAME = {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon();
         this.buildWorld(level);
-
-        const map = MAP.main.map;
-        const start_dir = map.startPosition.vector;
-        const start_grid = Grid.toClass(map.startPosition.grid);
-
-        HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
-        console.log("HERO.player", HERO.player);
-
+        HERO.playerSetUp();
         GAME.setCameraView();
         GAME.setWorld();
     },
@@ -458,6 +448,7 @@ const GAME = {
         ENTITY3D.manage(lapsedTime, date, [HERO.invisible, HERO.dead]);
         GAME.lifeLostFrameDraw(lapsedTime);
     },
+    over() { }
 };
 
 const TITLE = {
@@ -496,6 +487,7 @@ const TITLE = {
         const CTX = LAYER.title;
         CTX.fillStyle = "#000";
         CTX.roundRectLegacy(0, 0, ENGINE.titleWIDTH, ENGINE.titleHEIGHT, { upperLeft: 20, upperRight: 20, lowerLeft: 0, lowerRight: 0 }, true, true);
+        console.warn(ENGINE.titleWIDTH, "ENGINE.titleWIDTH");
     },
     bottomBackground() {
         const CTX = LAYER.bottom;
@@ -642,7 +634,6 @@ const TITLE = {
         const w = ENGINE.gameWIDTH;
         const remaining = GAME.time.remains();
         const fraction = remaining / INI.TIMEOUT;
-        //console.log("remaining", remaining, "fraction", fraction);
         ENGINE.percentBar(fraction, y, CTX, w, ["green", "yellow", "red"], h, x, 0);
     },
     score() {
@@ -679,7 +670,7 @@ const TITLE = {
         ENGINE.clearLayer("hiscore");
         const CTX = LAYER.hiscore;
         const fs = 18;
-        const x = ENGINE.titleWIDTH = ENGINE.gameWIDTH + INI.SCREEN_BORDER;;
+        const x = ENGINE.gameWIDTH + INI.SCREEN_BORDER;;
         const y = ENGINE.titleHEIGHT / 2 + fs / 4;
         CTX.font = fs + "px Moria";
         CTX.textAlign = "right";
@@ -700,6 +691,7 @@ const TITLE = {
     },
     lives() {
         ENGINE.clearLayer("lives");
+        if (GAME.lives < 1) return;
         const CTX = LAYER.lives;
         const cX = ENGINE.bottomWIDTH / 2;
         const y = ENGINE.bottomHEIGHT / 2;

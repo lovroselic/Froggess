@@ -26,8 +26,6 @@ LoadTextures = [
     //{ srcName: "Shading/Fire_color_map_512.webp", name: "Fire_color_map" },
     //{ srcName: "Shading/fire_noise_512.webp", name: "Fire_noise" },
 
-
-
     //title
     { srcName: "Title/Froggess_title_768.webp", name: "Title" },
     { srcName: "Title/FroggessBackground.webp", name: "FroggessBackground" },
@@ -42,6 +40,7 @@ LoadTextures = [
 
 LoadAudio = [
     { srcName: "Acceptance - LaughingSkull.mp3", name: "Title" },
+    { srcName: "death.mp3", name: "Death" },
 
     //action sounds
 
@@ -50,23 +49,19 @@ LoadAudio = [
 
 LoadShaders = [
     'vShader2D_1_0.glsl', 'fShader2D_1_0.glsl',
-    /*'vShader_1_2.glsl',
-    'fShader_1_5.glsl',
-    'pick_vShader_1_0.glsl', 'pick_fShader_1_0.glsl',
-    'particle_render_fShader_1_1.glsl', 'particle_render_vShader_1_0.glsl', 'particle_transform_fShader_1_0.glsl', 'particle_transform_vShader_1_1.glsl',
-    'model_vShader_1_2.glsl', 'fire_transform_vShader_1_0.glsl', 'fire_render_fShader_1_0.glsl',
-    'shadow_vShader_1_0.glsl', 'shadow_fShader_1_0.glsl'*/
 ];
 
 //LoadObjects = [  ];
 
-LoadModels = [
-
-];
+//LoadModels = [];
 
 LoadSprites = [
     //UI
     { srcName: "UI/FroggessLife.png", name: "Lives" },
+
+    //Items/sprites
+    { srcName: "Items/FroggessFilled.png", name: "FroggessFilled" },
+    { srcName: "Items/DeadFrog.png", name: "DeadFrog" },
 ];
 
 console.log("%cAssets for Froggess ready.", "color: orange");

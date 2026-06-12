@@ -1500,7 +1500,11 @@ const WebGL = {
 
 
         // draw HERO/player 
-        if (WebGL.hero && WebGL.hero.player) WebGL.hero.player.draw(gl, program, this.sprite_quad);
+        if (WebGL.hero && WebGL.hero.player) {
+            if (WebGL.hero.dead) {
+                WebGL.hero.player.draw(gl, program, this.sprite_quad, WebGL.hero.player.deathTexture)
+            } else WebGL.hero.player.draw(gl, program, this.sprite_quad);
+        }
 
         gl.bindVertexArray(null);
         gl.bindTexture(gl.TEXTURE_2D, null);
@@ -2776,8 +2780,8 @@ class $2D_Entity {
         this.GA = GA;
         if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
     }
-    draw(gl, program, spriteQuad) {
-        const texture = this.sprite.getSpriteTexture();
+    draw(gl, program, spriteQuad, texture = this.sprite.getSpriteTexture()) {
+        //const texture = this.sprite.getSpriteTexture();
         const modelMatrix = this.sprite.updateModelMatrix();
         gl.uniformMatrix4fv(program.uniformLocations.modelMatrix, false, modelMatrix);
         gl.uniform4fv(program.uniformLocations.tint, this.sprite.tint);
@@ -2849,6 +2853,9 @@ class $2D_player extends $2D_Entity {
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
         console.warn("checking end move, this.moveState.startGrid", this.moveState.startGrid, endValue, REVERSED_MAPDICT[endValue]);
+    }
+    addDeathTexture(img) {
+        this.deathTexture = WebGL.createTexture(img);
     }
 }
 
