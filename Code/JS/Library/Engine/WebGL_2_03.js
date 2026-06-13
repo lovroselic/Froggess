@@ -1503,7 +1503,9 @@ const WebGL = {
         if (WebGL.hero && WebGL.hero.player) {
             if (WebGL.hero.dead) {
                 WebGL.hero.player.draw(gl, program, this.sprite_quad, WebGL.hero.player.deathTexture)
-            } else WebGL.hero.player.draw(gl, program, this.sprite_quad);
+            } else {
+                if (WebGL.hero.player.sprite.visible) WebGL.hero.player.draw(gl, program, this.sprite_quad);
+            }
         }
 
         gl.bindVertexArray(null);
@@ -2704,11 +2706,14 @@ class $2D_Sprite {
         this.Nframes = this.asset.linear.length;
         this.nextSpriteTime = 1000 / this.fps;
         this.update(dir);
-        this.setVisibility();
+        this.show();
         this.updateModelMatrix();
     }
-    setVisibility(visible = true) {
-        this.visible = visible;
+    show() {
+        this.visible = true;
+    }
+    hide() {
+        this.visible = false;
     }
     rotationFromDir(dir) {
         this.dir = dir;
@@ -2852,29 +2857,30 @@ class $2D_player extends $2D_Entity {
     }
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
-        console.warn("checking end move, this.moveState.startGrid", this.moveState.startGrid, endValue, REVERSED_MAPDICT[endValue]);
+        const grid = this.moveState.startGrid;
+        console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
         switch (endValue) {
             case MAPDICT.HOLE:
-                return this.handleHoleMove();
+                return this.handleHoleMove(grid);
                 break;
             case MAPDICT.EMPTY:
-                return this.handleEmptyMove();
+                return this.handleEmptyMove(grid);
                 break;
             case MAPDICT.RESERVED:
-                return this.handleReservedMove();
+                return this.handleReservedMove(grid);
                 break;
             default:
                 throw new Error("unmanaged end move", REVERSED_MAPDICT[endValue]);
         }
     }
-    handleHoleMove() {
-        if (this.parent.handleHoleMove) this.parent.handleHoleMove();
+    handleHoleMove(grid) {
+        if (this.parent.handleHoleMove) this.parent.handleHoleMove(grid);
     }
-    handleEmptyMove() {
-        if (this.parent.handleEmptyMove) this.parent.handleEmptyMove();
+    handleEmptyMove(grid) {
+        if (this.parent.handleEmptyMove) this.parent.handleEmptyMove(grid);
     }
-    handleReservedMove() {
-        if (this.parent.handleReservedMove) this.parent.handleReservedMove();
+    handleReservedMove(grid) {
+        if (this.parent.handleReservedMove) this.parent.handleReservedMove(grid);
     }
     addDeathTexture(img) {
         this.deathTexture = WebGL.createTexture(img);

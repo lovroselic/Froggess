@@ -4207,6 +4207,10 @@ class CountDown extends Timer {
     remains() {
         return this.value - this.now;
     }
+    decrease(val){
+        this.value -= val;
+        this.value = Math.max(0, this.value);
+    }
 }
 class CountDownMS extends CountDown {
     constructor(id, ms, func, kwargs) {

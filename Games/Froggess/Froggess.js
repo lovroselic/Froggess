@@ -36,10 +36,12 @@ const INI = {
     TIMEOUT: 60,
     MAX_ROW: 11,
     SCORE_ROW: 10,
+    SCORE_GOAL: 50,
+    SCORE_PER_SECOND: 10,
 };
 
 const PRG = {
-    VERSION: "0.4.1",
+    VERSION: "0.4.2",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -94,7 +96,7 @@ const PRG = {
         $(ENGINE.gameWindowId).width(ENGINE.gameWIDTH + 2 * ENGINE.sideWIDTH + 4);
         ENGINE.addBOX("TITLE", ENGINE.titleWIDTH, ENGINE.titleHEIGHT, ["title", "score", "level", "hiscore", "time"], null);
         ENGINE.addBOX("LSIDE", INI.SCREEN_BORDER, ENGINE.gameHEIGHT, ["Lsideback",], "side");
-        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "coord", "3d_webgl", "info", "text", "FPS", "button", "click"], "side");
+        ENGINE.addBOX("ROOM", ENGINE.gameWIDTH, ENGINE.gameHEIGHT, ["background", "grid", "coord", "3d_webgl", "fill", "info", "text", "FPS", "button", "click"], "side");
         ENGINE.addBOX("SIDE", ENGINE.sideWIDTH, ENGINE.gameHEIGHT, ["sideback"], "fside");
         ENGINE.addBOX("DOWN", ENGINE.bottomWIDTH, ENGINE.bottomHEIGHT, ["bottom", "bottomText", "subtitle", "lives",], null);
 
@@ -125,6 +127,7 @@ const HERO = {
         this.player = null;
         this.dead = false;
         this.row = INI.MAX_ROW;
+        this.to_fill = 5;
     },
     concludeAction() {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
@@ -152,50 +155,7 @@ const HERO = {
         this.player.continueMove(lapsedTime);
     },
     completeLevel() {
-        if (GAME.levelComplete) return;
-        GAME.timerRunning = false;
-        GAME.levelComplete = true;
-        GAME.time.stop();
-        const name = $("#princess")[0].value;
-        let time = GAME.time.getTime();
-        console.log("time", GAME.time.time(), time, "princess", name);
-
-
-        const W = ENGINE.gameWIDTH * INI.WINDOW_SCALE >>> 0;
-        const H = ENGINE.gameHEIGHT * INI.WINDOW_SCALE >>> 0;
-        const X = (ENGINE.gameWIDTH - W >>> 1) + ENGINE.sideWIDTH;
-        const Y = (ENGINE.gameHEIGHT - H >>> 1) + ENGINE.titleHEIGHT;
-        ENGINE.GAME.pause(false);
-
-        //preparing
-        let idx = binarySearch(MAP_SCORES[GAME.level].scores.values, time);
-        let startIdx = Math.max(0, idx - INI.DISPLAY_SCORES + 1);
-        let endIdx = Math.min(MAP_SCORE_MANAGER.ENTRIES, startIdx + INI.DISPLAY_SCORES);
-        console.log("idx", idx, "startIdx", startIdx);
-
-        MAP_SCORES[GAME.level].scores.values.splice(idx, 0, time);
-        MAP_SCORES[GAME.level].scores.values.pop();
-        MAP_SCORES[GAME.level].scores.names.splice(idx, 0, name);
-        MAP_SCORES[GAME.level].scores.names.pop();
-
-        // creating html wedge
-        let WEDGE = "";
-
-        for (let resultIndex = startIdx; resultIndex < endIdx; resultIndex++) {
-            let P = `<p id="result_${resultIndex}">${(resultIndex + 1).toString().padStart(2, "0")}. ${MAP_SCORES[GAME.level].scores.names[resultIndex]}:`
-            let time = Timer.MSH_String(Timer.toHMS(MAP_SCORES[GAME.level].scores.values[resultIndex]));
-            P += ` ${time}</p>`;
-            WEDGE += P;
-        }
-
-        // done creating html wedge
-
-        const _form = new Form(`${name}'s result:`, X, Y, W, H, WEDGE);                      //don't be fooled, this IS used, it draws!
-        $("#form_done").off("click", FORM.exit);
-        $("#form_done").on("click", HERO.nextLevel);
-        $(`#result_${idx}`).css("color", "#00FF00");
-
-        localStorage.setItem(PRG.SG, JSON.stringify(MAP_SCORES));                           // save scores
+        throw "complete level";
     },
     nextLevel() {
         $("#FORM").remove();
@@ -209,21 +169,34 @@ const HERO = {
         HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
         console.log("HERO.player", HERO.player);
+        if (GAME.time) GAME.time.unregister();
+        GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
-    handleHoleMove() {
-        console.warn("handleHoleMove");
+    handleHoleMove(grid) {
+        console.warn("handleHoleMove", grid);
 
         //check survival ..
 
         this.checkForwardProgress();
     },
-    handleEmptyMove() {
-        console.warn("handleEmptyMove");
+    handleEmptyMove(grid) {
+        console.warn("handleEmptyMove", grid);
         this.checkForwardProgress();
     },
-    handleReservedMove() {
-        console.warn("handleReservedMove");
-
+    handleReservedMove(grid) {
+        console.warn("handleReservedMove", grid);
+        this.to_fill--;
+        if (this.to_fill === 0) return this.completeLevel();
+        //draw
+        const GA = this.player.GA;
+        console.log("GA", GA);
+        GA.toWall(grid);
+        ENGINE.drawToGrid("fill", grid, SPRITE.FroggessFilled);
+        GAME.score += INI.SCORE_GOAL;
+        TITLE.score();
+        this.player.sprite.hide();
+        GAME.time.stop();
+        ENGINE.GAME.ANIMATION.next(GAME.goalReachedRun);
     },
     checkForwardProgress() {
         const currentRow = this.player.moveState.startGrid.y;
@@ -279,10 +252,6 @@ const GAME = {
         console.log("starting level", GAME.level);
         HERO.construct();
         this.levelComplete = false;
-        if (GAME.time) GAME.time.unregister();
-        //GAME.time = null;
-        GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
-        //GAME.time = new CountDown("LevelTime", 2, HERO.die);
         GAME.initLevel(GAME.level);
         GAME.continueLevel();
     },
@@ -318,7 +287,7 @@ const GAME = {
         MAP_TOOLS.unpack("main");
     },
     prepareForRestart() {
-        let clear = ["background", "text", "FPS", "button", "bottomText"];
+        let clear = ["background", "text", "FPS", "button", "bottomText", "fill"];
         ENGINE.clearManylayers(clear);
         TITLE.blackBackgrounds();
         ENGINE.TIMERS.clear();
@@ -440,6 +409,23 @@ const GAME = {
         SCORE.checkScore(GAME.score);
         SCORE.hiScore();
     },
+    goalReachedRun() {
+        if (ENGINE.GAME.stopAnimation) return;
+        GAME.time.decrease(1);
+        GAME.score += INI.SCORE_PER_SECOND;
+        const remains = GAME.time.remains();
+        //console.log("remains", remains);
+        if (remains <= 0) {
+            HERO.playerSetUp();
+            ENGINE.GAME.ANIMATION.next(ENGINE.GAME.gameLoop);
+        }
+
+        GAME.goalReachedFrameDraw();
+    },
+    goalReachedFrameDraw() {
+        TITLE.time();
+        TITLE.score();
+    }
 };
 
 const TITLE = {
@@ -464,6 +450,8 @@ const TITLE = {
             "sideback", "button", "title", "FPS", "info", "subtitle",
             "score", "level", "hiscore",
             "lives", "time",
+            "fill",
+            "grid", "coord",
             "bottomText"]);
         ENGINE.clearLayerStack();
         WebGL.transparent();
