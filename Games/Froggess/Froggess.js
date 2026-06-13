@@ -41,7 +41,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.4.2",
+    VERSION: "0.5.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -127,7 +127,8 @@ const HERO = {
         this.player = null;
         this.dead = false;
         this.row = INI.MAX_ROW;
-        this.to_fill = 5;
+        //this.to_fill = 5;
+        this.to_fill = 1; //
     },
     concludeAction() {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
@@ -155,7 +156,9 @@ const HERO = {
         this.player.continueMove(lapsedTime);
     },
     completeLevel() {
-        throw "complete level";
+        console.error("level completed");
+        GAME.level++;
+        GAME.levelStart();
     },
     nextLevel() {
         $("#FORM").remove();
@@ -185,11 +188,7 @@ const HERO = {
     },
     handleReservedMove(grid) {
         console.warn("handleReservedMove", grid);
-        this.to_fill--;
-        if (this.to_fill === 0) return this.completeLevel();
-        //draw
         const GA = this.player.GA;
-        console.log("GA", GA);
         GA.toWall(grid);
         ENGINE.drawToGrid("fill", grid, SPRITE.FroggessFilled);
         GAME.score += INI.SCORE_GOAL;
@@ -239,8 +238,8 @@ const GAME = {
         GAME.score = 0;
 
         GAME.fps = new FPS_short_term_measurement(300);
-        GAME.prepareForRestart();
-        ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
+        //GAME.prepareForRestart();
+        //ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         if (DEBUG._2D_display) GRID.grid();
 
         GAME.levelStart();
@@ -250,6 +249,8 @@ const GAME = {
     },
     levelStart() {
         console.log("starting level", GAME.level);
+        GAME.prepareForRestart();
+        ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         HERO.construct();
         this.levelComplete = false;
         GAME.initLevel(GAME.level);
@@ -285,6 +286,7 @@ const GAME = {
     },
     newDungeon() {
         MAP_TOOLS.unpack("main");
+        MAP.main.unpacked = false;
     },
     prepareForRestart() {
         let clear = ["background", "text", "FPS", "button", "bottomText", "fill"];
@@ -414,8 +416,9 @@ const GAME = {
         GAME.time.decrease(1);
         GAME.score += INI.SCORE_PER_SECOND;
         const remains = GAME.time.remains();
-        //console.log("remains", remains);
         if (remains <= 0) {
+            HERO.to_fill--;
+            if (HERO.to_fill === 0) return HERO.completeLevel();
             HERO.playerSetUp();
             ENGINE.GAME.ANIMATION.next(ENGINE.GAME.gameLoop);
         }
