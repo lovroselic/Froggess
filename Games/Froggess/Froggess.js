@@ -22,7 +22,7 @@ const DEBUG = {
     SETTING: true,
     FPS: true,
     VERBOSE: true,
-    _2D_display: true,
+    _2D_display: false,
     INVINCIBLE: false,
     keys: false,
     max17: false,
@@ -41,7 +41,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.5.0",
+    VERSION: "0.5.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -126,9 +126,11 @@ const HERO = {
     construct() {
         this.player = null;
         this.dead = false;
+        this.carried = false;
+        //this.drowned = false;
         this.row = INI.MAX_ROW;
-        //this.to_fill = 5;
-        this.to_fill = 1; //
+        this.to_fill = 5;
+        //this.to_fill = 1; //
     },
     concludeAction() {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
@@ -138,12 +140,14 @@ const HERO = {
         if (HERO.dead) return;
         HERO.dead = true;
     },
-    death() {
+    async death() {
         console.error("HERO.death");
         ENGINE.GAME.ANIMATION.stop();
-        $(AUDIO.Death).one("ended", HERO.finalDeath);
-        AUDIO.Death.play();
         GAME.lives--;
+
+        await AUDIO_TOOLS.waitUntilEnded(AUDIO.Splash);
+        await AUDIO_TOOLS.playAndWait(AUDIO.Death);
+        HERO.finalDeath();
     },
     finalDeath() {
         console.error("HERO.finalDeath");
@@ -157,6 +161,7 @@ const HERO = {
     },
     completeLevel() {
         console.error("level completed");
+        AUDIO.LevelUp.play();
         GAME.level++;
         GAME.levelStart();
     },
@@ -179,12 +184,19 @@ const HERO = {
         console.warn("handleHoleMove", grid);
 
         //check survival ..
+        if (false) {
+            HERO.carried = true;
+            HERO.checkForwardProgress();
+        }
 
-        this.checkForwardProgress();
+        //
+        AUDIO.Splash.play();
+        HERO.die();
     },
     handleEmptyMove(grid) {
         console.warn("handleEmptyMove", grid);
-        this.checkForwardProgress();
+        HERO.carried = false;
+        HERO.checkForwardProgress();
     },
     handleReservedMove(grid) {
         console.warn("handleReservedMove", grid);
@@ -193,7 +205,7 @@ const HERO = {
         ENGINE.drawToGrid("fill", grid, SPRITE.FroggessFilled);
         GAME.score += INI.SCORE_GOAL;
         TITLE.score();
-        this.player.sprite.hide();
+        HERO.player.sprite.hide();
         GAME.time.stop();
         ENGINE.GAME.ANIMATION.next(GAME.goalReachedRun);
     },
@@ -238,8 +250,6 @@ const GAME = {
         GAME.score = 0;
 
         GAME.fps = new FPS_short_term_measurement(300);
-        //GAME.prepareForRestart();
-        //ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         if (DEBUG._2D_display) GRID.grid();
 
         GAME.levelStart();

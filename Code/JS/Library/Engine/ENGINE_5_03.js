@@ -4207,7 +4207,7 @@ class CountDown extends Timer {
     remains() {
         return this.value - this.now;
     }
-    decrease(val){
+    decrease(val) {
         this.value -= val;
         this.value = Math.max(0, this.value);
     }
@@ -4546,6 +4546,42 @@ class SlideShow {
         SPEECH.speakWithArticulation(this.texts[this.frame]);
     }
 }
+
+const AUDIO_TOOLS = {
+    waitUntilEnded(audio) {
+        return new Promise(resolve => {
+            if (!audio || audio.ended || audio.paused) {
+                resolve();
+                return;
+            }
+
+            audio.addEventListener("ended", resolve, { once: true });
+        });
+    },
+
+    playAndWait(audio) {
+        return new Promise(resolve => {
+            if (!audio) {
+                resolve();
+                return;
+            }
+
+            audio.pause();
+            audio.currentTime = 0;
+
+            audio.addEventListener("ended", resolve, { once: true });
+
+            const playPromise = audio.play();
+
+            if (playPromise) {
+                playPromise.catch(err => {
+                    console.warn("Audio play failed:", err);
+                    resolve();
+                });
+            }
+        });
+    }
+};
 
 //END
 console.log(`%cENGINE ${ENGINE.VERSION} loaded.`, ENGINE.CSS);
