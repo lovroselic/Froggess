@@ -191,6 +191,7 @@ const WebGL = {
     dynamicLightSources: [MISSILE3D, EXPLOSION3D, FIRE3D],
     enemySources: [ENTITY3D],
     models: [$3D_MODEL],
+    sprite2D_list: [PLANE_GRID1D],
     modelTextureSet: false,
     main_program: {
         vSource: "vShader",
@@ -438,6 +439,7 @@ const WebGL = {
         EXPLOSION3D.init(map, hero);
         LAIR.init(map, hero);
         ITEM_DROPPER3D.init(map);
+        PLANE_GRID1D.init(map, hero);
         this.hero = hero;
         this.game = game;
     },
@@ -1496,8 +1498,13 @@ const WebGL = {
         gl.uniform1i(program.uniformLocations.uSampler, 0);
         gl.bindVertexArray(this.sprite_quad.vao);
 
-        // draw non-player entities , to be added later
-
+        // draw non-player entities 
+        for (const iam of WebGL.sprite2D_list) {
+            for (const entity of iam.POOL) {
+                //if (entity.visible) entity.draw(gl, program, this.sprite_quad);
+                entity.draw(gl, program, this.sprite_quad);
+            }
+        }
 
         // draw HERO/player 
         if (WebGL.hero && WebGL.hero.player) {
@@ -2708,6 +2715,7 @@ class $2D_Sprite {
             this.fps = this.fps || 60;
             this.nextSpriteTime = 1000 / this.fps;
         }
+        this.dirRef = Vector.toClass(this.dirRef);
         this.update(dir);
         this.show();
         this.updateModelMatrix();
@@ -2720,7 +2728,8 @@ class $2D_Sprite {
     }
     rotationFromDir(dir) {
         this.dir = dir;
-        this.rotation = dir.radAngleBetweenVectors(UP);
+        //console.info("this.dirRef", this.dirRef);
+        this.rotation = dir.radAngleBetweenVectors(this.dirRef);
     }
     reset() {
         this.frame = 0;

@@ -33,7 +33,8 @@ const INI = {
     HERO_HEALTH: 100,
     //HERO_HEIGHT: 0.15,
     WINDOW_SCALE: 0.90,
-    TIMEOUT: 60,
+    //TIMEOUT: 60,
+    TIMEOUT: 60000,
     MAX_ROW: 11,
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
@@ -41,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.5.2",
+    VERSION: "0.5.3",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -127,7 +128,6 @@ const HERO = {
         this.player = null;
         this.dead = false;
         this.carried = false;
-        //this.drowned = false;
         this.row = INI.MAX_ROW;
         this.to_fill = 5;
         //this.to_fill = 1; //
@@ -292,7 +292,6 @@ const GAME = {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
         WebGL.init_required_IAM(MAP.main.map, HERO);
         SPAWN_TOOLS.spawnLanes(level, MAP.main.map.GA);
-
     },
     newDungeon() {
         MAP_TOOLS.unpack("main");
@@ -304,12 +303,12 @@ const GAME = {
         TITLE.blackBackgrounds();
         ENGINE.TIMERS.clear();
     },
-    setup() {
+    async setup() {
         console.log("GAME SETUP started");
         $("#conv").remove();
         GAME.WebGL_settings();
         WebGL.setContext('webgl');
-        ASSET.convertToTextures();
+        await ASSET.convertToTextures();
     },
     setTitle() {
         const text = GAME.generateTitleText();

@@ -473,21 +473,16 @@ const SPAWN_TOOLS = {
                 for (let x = lane.start; x < GA.width; x += lane.gap + type.gridLength) {
                     const dir = new Vector(lane.dir, 0);
                     for (let off = 0; off < type.gridLength; off++) {
-                        const grid = new Grid(x + off, laneIndex);
+                        const grid = new Grid(x + off, GA.height - laneIndex - 1);
                         console.log("....x", x, "grid", grid, "dir", dir);
                         type.spriteTexture = ASSET[type.asset].textures[off] || ASSET[type.asset].textures[0];
                         const entity = new $2D_Grid_Cycling_Entity_Part(grid, dir, type, GA);
                         console.log(".....entity", entity);
+                        PLANE_GRID1D.add(entity);
                     }
-
-
-
-
                 }
-
             }
         }
-
         console.info(`Lanes for level ${level} spawned.`);
     }
 };

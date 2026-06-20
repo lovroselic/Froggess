@@ -12,7 +12,7 @@ TODO:
 */
 
 const IndexArrayManagers = {
-    VERSION: "4.01",
+    VERSION: "4.02",
     VERBOSE: false,
     DEAD_LAPSED_TIME: 5,
     DEADLY_TOUCH: false,
@@ -1010,7 +1010,7 @@ class Bullet3D extends IAM {
 
                 const pos = Vector3.to_Grid3D(obj.pos);
 
-                if (GA.isOutOfBounds(pos)) {                         
+                if (GA.isOutOfBounds(pos)) {
                     obj.clean();
                     continue;
                 }
@@ -1046,12 +1046,12 @@ class Bullet3D extends IAM {
             for (let P of possibleEnemies) {
                 const enemy = this.entity_IAM.show(P);
                 if (enemy) {
-            
+
                     const hit = GRID.collisionPosInBoundingBox(obj.pos, enemy.moveState.absoluteBoundingBox, new FP_Grid3D(), false);
                     if (hit) {
                         obj.clean();
                         enemy.kill(true);
-                        break;      
+                        break;
                     }
                 }
             }
@@ -1178,7 +1178,7 @@ class Animated_3d_entity extends IAM {
 
         const heroRefGrid = Vector3.to_Grid3D(this.hero.player.pos);
         if (GA.isOutOfBounds(heroRefGrid)) return;                                                  // nothing to do if hero is OOB
-        
+
         GRID.calcDistancesBFS_A_3D(heroRefGrid, map, false, GROUND_MOVE_GRID_EXCLUSION);            //ground exlusion 3d on xy plane, this needs to be separate because of hunting on exact position!
         GRID.calcDistancesBFS_A_3D(heroRefGrid, map, true, AIR_MOVE_GRID_EXCLUSION, "airNodeMap");  //air exclusion fully 3d
 
@@ -1373,6 +1373,14 @@ class ItemDropper3D extends IAM {
     }
 }
 
+/** 1d plane manager */
+
+class PlaneGridEntity1D extends IAM {
+    constructor() {
+        super();
+    }
+}
+
 /** GLOBAL ID */
 
 const GLOBAL_ID_MANAGER = {
@@ -1457,5 +1465,6 @@ const BULLET3D = new Bullet3D("enemyIA", ENTITY3D, "item3D", ITEM3D);
 const DYNAMIC_ITEM3D = new Decal3D(256, "dynamic_item3d");
 const LAIR = new Lair3D();
 const ITEM_DROPPER3D = new ItemDropper3D();
+const PLANE_GRID1D = new PlaneGridEntity1D();
 /** *********************************************** */
 console.log(`%cIndexArrayManagers (IAM) ${IndexArrayManagers.VERSION} ready.`, "color: #7FFFD4");

@@ -15,6 +15,7 @@ const HERO_TYPE = {
         h: 54,
         fps: 30,
         animate: true,
+        dirRef: UP,
     }
 };
 
@@ -26,6 +27,7 @@ const MONSTER_TYPE = {
         canVanish: false,
         vanishTimer: 0,
         animate: false,
+        dirRef: RIGHT,
     },
     Log4: {
         category: "carrier",
@@ -34,6 +36,7 @@ const MONSTER_TYPE = {
         canVanish: false,
         vanishTimer: 0,
         animate: false,
+        dirRef: RIGHT,
     },
     Log5: {
         category: "carrier",
@@ -42,6 +45,7 @@ const MONSTER_TYPE = {
         canVanish: false,
         vanishTimer: 0,
         animate: false,
+        dirRef: RIGHT,
     },
     Turtle2: {
         category: "carrier",
@@ -50,6 +54,7 @@ const MONSTER_TYPE = {
         canVanish: true,
         vanishTimer: 12,
         animate: false,
+        dirRef: LEFT,
     },
     Turtle3: {
         category: "carrier",
@@ -58,6 +63,7 @@ const MONSTER_TYPE = {
         canVanish: true,
         vanishTimer: 10,
         animate: false,
+        dirRef: LEFT,
     },
     Turtle4: {
         category: "carrier",
@@ -66,5 +72,6 @@ const MONSTER_TYPE = {
         canVanish: true,
         vanishTimer: 8,
         animate: false,
+        dirRef: LEFT,
     },
 };
