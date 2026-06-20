@@ -456,6 +456,39 @@ const SPAWN_TOOLS = {
     },
     spawnSunFromCamera(position, lightColor) {
         SUN3D.add(new LightSource(position, DIR_DOWN, lightColor));
+    },
+    spawnLanes(level, GA = MAP_TOOLS.MAP[level].map.GA) {
+        const map = MAP_TOOLS.MAP[level];
+        console.log("spawning lanes for level", level, "map", map, "GA", GA, "GA.width", GA.width);
+        for (const laneIndex in MAP_TOOLS.MAP[level]) {
+            const lane = map[laneIndex]
+            console.log("..lane", laneIndex, lane);
+            const types = lane.types || null;
+            if (types) {
+                const type = MONSTER_TYPE[types.chooseRandom()];
+                type.speed = lane.speed;
+                type.w = ENGINE.INI.GRIDPIX;
+                type.h = ENGINE.INI.GRIDPIX;
+                console.log("...type", type);
+                for (let x = lane.start; x < GA.width; x += lane.gap + type.gridLength) {
+                    const dir = new Vector(lane.dir, 0);
+                    for (let off = 0; off < type.gridLength; off++) {
+                        const grid = new Grid(x + off, laneIndex);
+                        console.log("....x", x, "grid", grid, "dir", dir);
+                        type.spriteTexture = ASSET[type.asset].textures[off] || ASSET[type.asset].textures[0];
+                        const entity = new $2D_Grid_Cycling_Entity_Part(grid, dir, type, GA);
+                        console.log(".....entity", entity);
+                    }
+
+
+
+
+                }
+
+            }
+        }
+
+        console.info(`Lanes for level ${level} spawned.`);
     }
 };
 

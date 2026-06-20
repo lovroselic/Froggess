@@ -11,6 +11,11 @@
 
 LoadSheetSequences = [
     { srcName: "Froggess.png", count: 6, name: "Froggess" },
+    { srcName: "Log3.webp", count: 3, name: "Log3" },
+    { srcName: "Log4.webp", count: 4, name: "Log4" },
+    { srcName: "Log5.webp", count: 5, name: "Log5" },
+    { srcName: "SnakeAnimation.png", count: 4, name: "Snake" },
+    { srcName: "Turtle.webp", count: 1, name: "Turtle" },
 ];
 
 LoadFonts = [
@@ -62,6 +67,7 @@ LoadSprites = [
     //Items/sprites
     { srcName: "Items/FroggessFilled.png", name: "FroggessFilled" },
     { srcName: "Items/DeadFrog.png", name: "DeadFrog" },
+
 ];
 
 console.log("%cAssets for Froggess ready.", "color: orange");

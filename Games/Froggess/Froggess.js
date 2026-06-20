@@ -31,7 +31,7 @@ const DEBUG = {
 const INI = {
     SCREEN_BORDER: 64,
     HERO_HEALTH: 100,
-    HERO_HEIGHT: 0.15,
+    //HERO_HEIGHT: 0.15,
     WINDOW_SCALE: 0.90,
     TIMEOUT: 60,
     MAX_ROW: 11,
@@ -41,7 +41,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.5.1",
+    VERSION: "0.5.2",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -291,7 +291,7 @@ const GAME = {
     buildWorld(level) {
         if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
         WebGL.init_required_IAM(MAP.main.map, HERO);
-        //SPAWN_TOOLS.spawn(level);
+        SPAWN_TOOLS.spawnLanes(level, MAP.main.map.GA);
 
     },
     newDungeon() {

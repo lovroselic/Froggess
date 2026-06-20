@@ -2702,9 +2702,12 @@ class $2D_Sprite {
         this.dir = dir;
         ImportTypeToConstructor(this, type);
         this.tint = tint;
-        this.asset = ASSET[this.asset];
-        this.Nframes = this.asset.linear.length;
-        this.nextSpriteTime = 1000 / this.fps;
+        if (this.asset) {
+            this.asset = ASSET[this.asset];
+            this.Nframes = this.asset.linear.length;
+            this.fps = this.fps || 60;
+            this.nextSpriteTime = 1000 / this.fps;
+        }
         this.update(dir);
         this.show();
         this.updateModelMatrix();
@@ -2748,6 +2751,7 @@ class $2D_Sprite {
         return this.modelMatrix;
     }
     updateAnimation(lapsedTime) {
+        if (!this.animate) return;
         if (this.Nframes <= 1) return;
         this.currentSpriteTime += lapsedTime;
         if (this.currentSpriteTime >= this.nextSpriteTime) {
@@ -2773,6 +2777,7 @@ class $2D_Sprite {
         this.updateModelMatrix();
     }
     getSpriteTexture() {
+        if (this.spriteTexture) return this.spriteTexture;
         return this.asset.textures[this.frame];
     }
 }
@@ -2786,7 +2791,6 @@ class $2D_Entity {
         if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
     }
     draw(gl, program, spriteQuad, texture = this.sprite.getSpriteTexture()) {
-        //const texture = this.sprite.getSpriteTexture();
         const modelMatrix = this.sprite.updateModelMatrix();
         gl.uniformMatrix4fv(program.uniformLocations.modelMatrix, false, modelMatrix);
         gl.uniform4fv(program.uniformLocations.tint, this.sprite.tint);
@@ -2812,13 +2816,11 @@ class $2D_player extends $2D_Entity {
     }
     move(dir) {
         const nextGrid = this.moveState.startGrid.add(dir);
-        //console.warn("try moving dir", dir, "oob", this.GA.isOutOfBounds(nextGrid), "wall", this.GA.isWall(nextGrid));
         if (this.GA.isOutOfBounds(nextGrid)) return;
         if (this.GA.isWall(nextGrid)) return;
 
         //allowed moves so far: EMPTY, HOLE
         const nextValue = this.GA.getValue(nextGrid);
-        //console.log(".player start moving dir", dir, "startGrid", this.moveState.startGrid, "nextGrid", nextGrid, "nextValue", nextValue, REVERSED_MAPDICT[nextValue]);
         this.startMoving(dir);
     }
     respond(lapsedTime) {
@@ -2884,6 +2886,17 @@ class $2D_player extends $2D_Entity {
     }
     addDeathTexture(img) {
         this.deathTexture = WebGL.createTexture(img);
+    }
+}
+
+class $2D_Grid_Cycling_Entity_Part {
+    constructor(grid, dir, type, GA) {
+        this.sprite = new $2D_Sprite(grid, dir, type);
+        this.actor = this.sprite;                               // legacy compatibility, redundant already?
+        this.moveState = new MoveState(grid, dir, GA);
+        this.GA = GA;
+        if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
+        this.draw = $2D_Entity.prototype.draw;
     }
 }
 

@@ -3,15 +3,8 @@
 /*jshint -W117 */
 /*jshint -W061 */
 
-/**
- * definition of:
- *      monsters
- *      scrolls
- *      other item types
- */
-
 "use strict";
-console.log("%cMonsters for Groggess loaded.", "color: #888");
+console.log("%cMonsters for Froggess loaded.", "color: #888");
 
 const HERO_TYPE = {
     Froggess: {
@@ -21,17 +14,57 @@ const HERO_TYPE = {
         w: 64,
         h: 54,
         fps: 30,
+        animate: true,
     }
 };
 
 const MONSTER_TYPE = {
-    /*Skeleton: {
-        name: "WhiteSkeleton",
-        model: "Skeleton",
-        scale: 1.5 / 2 ** 4,
-        rotateToNorth: Math.PI,
-        midHeight: 0.5,
-        material: MATERIAL.standardShine,
-        static: true
-    },*/
+    Log3: {
+        category: "carrier",
+        gridLength: 3,
+        asset: "Log3",
+        canVanish: false,
+        vanishTimer: 0,
+        animate: false,
+    },
+    Log4: {
+        category: "carrier",
+        gridLength: 4,
+        asset: "Log4",
+        canVanish: false,
+        vanishTimer: 0,
+        animate: false,
+    },
+    Log5: {
+        category: "carrier",
+        gridLength: 5,
+        asset: "Log5",
+        canVanish: false,
+        vanishTimer: 0,
+        animate: false,
+    },
+    Turtle2: {
+        category: "carrier",
+        gridLength: 2,
+        asset: "Turtle",
+        canVanish: true,
+        vanishTimer: 12,
+        animate: false,
+    },
+    Turtle3: {
+        category: "carrier",
+        gridLength: 3,
+        asset: "Turtle",
+        canVanish: true,
+        vanishTimer: 10,
+        animate: false,
+    },
+    Turtle4: {
+        category: "carrier",
+        gridLength: 4,
+        asset: "Turtle",
+        canVanish: true,
+        vanishTimer: 8,
+        animate: false,
+    },
 };
