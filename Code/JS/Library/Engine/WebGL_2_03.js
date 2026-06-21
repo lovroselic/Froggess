@@ -1498,10 +1498,10 @@ const WebGL = {
         gl.uniform1i(program.uniformLocations.uSampler, 0);
         gl.bindVertexArray(this.sprite_quad.vao);
 
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
         // draw non-player entities 
         for (const iam of WebGL.sprite2D_list) {
@@ -2733,7 +2733,6 @@ class $2D_Sprite {
     }
     rotationFromDir(dir) {
         this.dir = dir;
-        //console.info("this.dirRef", this.dirRef);
         this.rotation = dir.radAngleBetweenVectors(this.dirRef);
     }
     reset() {
@@ -2747,7 +2746,7 @@ class $2D_Sprite {
     getArea() {
         //rotation is ignored ... fuck it
         this.topLeft = this.pos.toTopLeft();
-        this.area = new RectArea(this.topLeft.x, this.topLeft.y, this.w, this.h);
+        this.area = new RectArea(Math.round(this.topLeft.x), Math.round(this.topLeft.y), this.w, this.h);
         return this.area;
     }
     update(dir) {
@@ -2759,7 +2758,7 @@ class $2D_Sprite {
         if (!this.modelMatrix) this.modelMatrix = glMatrix.mat4.create();
 
         glMatrix.mat4.identity(this.modelMatrix);
-        glMatrix.mat4.translate(this.modelMatrix, this.modelMatrix, [this.pos.x, this.pos.y, 0]);
+        glMatrix.mat4.translate(this.modelMatrix, this.modelMatrix, [Math.round(this.pos.x), Math.round(this.pos.y), 0]);
         glMatrix.mat4.rotateZ(this.modelMatrix, this.modelMatrix, this.rotation || 0);
         glMatrix.mat4.scale(this.modelMatrix, this.modelMatrix, [this.w, this.h, 1]);
         return this.modelMatrix;
@@ -2795,6 +2794,7 @@ class $2D_Sprite {
         return this.asset.textures[this.frame];
     }
 }
+
 
 class $2D_Entity {
     constructor(grid, dir, type, GA) {
@@ -2923,7 +2923,6 @@ class $2D_Grid_Cycling_Entity_Part {
         }
     }
     checkPosition() {
-        //console.log("this.moveState.startGrid.x", this.moveState.startGrid.x, this.moveState.endGrid.x, this.moveState.homeGrid.x, "this.dir.x", this.dir.x);
         if (this.moveState.startGrid.x < 0 && this.dir.x < 0) {
             this.moveToRight();
         } else if (this.moveState.startGrid.x >= this.GA.width && this.dir.x > 0) {
@@ -2933,13 +2932,10 @@ class $2D_Grid_Cycling_Entity_Part {
     moveToRight() {
         this.moveState.startGrid.x = this.GA.width;
         this.adjustPos();
-        //console.log("moveToRight");
     }
     moveToLeft() {
         this.moveState.startGrid.x = -1; //-1
         this.adjustPos();
-        //this.actor.pos.x = -24;
-        console.log("moveToLeft", this.actor.pos.x);
     }
     adjustPos() {
         this.actor.pos = GRID.gridToCenterPX(this.moveState.startGrid);

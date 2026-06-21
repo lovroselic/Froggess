@@ -772,13 +772,18 @@ class FP_Grid extends MasterGridClass {
 class Point extends MasterGridClass {
     constructor(x = 0, y = 0) {
         super();
-        this.x = Math.round(x);
-        this.y = Math.round(y);
+        this.x = x;
+        this.y = y;
+        //this.x = Math.round(x);
+        //this.y = Math.round(y);
         //this.x = Math.floor(x);
         //this.y = Math.floor(y);
     }
     static toClass(point) {
         return new Point(point.x, point.y);
+    }
+    static rounded(point) {
+        return new Point(Math.round(point.x), Math.round(point.y));
     }
     translate(vector, len = ENGINE.INI.GRIDPIX) {
         return new Point(this.x + vector.x * len, this.y + vector.y * len);

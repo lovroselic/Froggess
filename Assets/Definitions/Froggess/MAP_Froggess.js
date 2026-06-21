@@ -41,7 +41,7 @@ const MAP = {
         4: {
             dir: -1,
             gap: 7,
-            speed: 1.3,
+            speed: 1.35,
         },
         //mid row, pavement
         5: {
@@ -61,28 +61,28 @@ const MAP = {
         7: {
             dir: 1,
             gap: 2,
-            speed: 1.2,
+            speed: 1.15,
             types: ["Log3"],
             start: 1,
         },
         8: {
             dir: 1,
             gap: 2,
-            speed: 1.5,
+            speed: 1.75,
             types: ["Log5"],
             start: 2,
         },
         9: {
             dir: -1,
             gap: 3,
-            speed: 1.2,
+            speed: 1.25,
             types: ["Turtle4"],
             start: 1,
         },
         10: {
             dir: 1,
             gap: 3,
-            speed: 1.2,
+            speed: 1.4,
             types: ["Log4"],
             start: 0,
         }

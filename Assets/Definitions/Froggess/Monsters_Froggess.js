@@ -65,6 +65,7 @@ const MONSTER_TYPE = {
         category: "carrier",
         gridLength: 3,
         asset: "Turtle",
+        //asset: "Log3",
         canVanish: true,
         vanishTimer: 10,
         animate: false,

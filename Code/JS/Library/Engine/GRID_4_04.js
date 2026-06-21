@@ -293,13 +293,14 @@ const GRID = {
         entity.moveState.homeGrid = GRID.pointToGrid(entity.actor.pos);
         entity.moveState.pos = entity.actor.pos.toTopLeft().to_FP_Grid();
         const overallDistance = entity.moveState.pos.distance(entity.moveState.startGrid);
+
         if (overallDistance >= 1.0) {
             entity.moveState.moving = false;
             entity.moveState.startGrid = entity.moveState.endGrid;
             entity.moveState.homeGrid = entity.moveState.startGrid;
             entity.moveState.pos = FP_Grid.toClass(entity.moveState.homeGrid)
+            entity.actor.pos = GRID.gridToCenterPX(entity.moveState.startGrid);
             if (onFinish) onFinish.call();
-            //console.error("..finish move debug", "entity.moveState.startGrid", entity.moveState.startGrid, "entity.moveState.homeGrid", entity.moveState.homeGrid);
         }
     },
 
