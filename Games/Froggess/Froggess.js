@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.5.3",
+    VERSION: "0.5.4",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -348,8 +348,9 @@ const GAME = {
         GAME.respond(lapsedTime);
         ENGINE.TIMERS.update();
         HERO.manage(lapsedTime);
+        PLANE_GRID1D.update(lapsedTime);
         GAME.frameDraw(lapsedTime);
-        HERO.concludeAction();
+        HERO.concludeAction(lapsedTime);
         if (HERO.dead) IAM.checkIfProcessesComplete([EXPLOSION3D], HERO.death);
         if (GAME.completed) GAME.won();
     },

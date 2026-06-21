@@ -2906,6 +2906,15 @@ class $2D_Grid_Cycling_Entity_Part {
         this.GA = GA;
         if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
         this.draw = $2D_Entity.prototype.draw;
+        this.dir = dir;
+        //ImportTypeToConstructor(this, type);
+    }
+    update(lapsedTime) {
+        if (this.moveState.moving) {
+            GRID.translateMove2D(this, lapsedTime, null, false);
+        } else {
+            this.moveState.next(this.dir);
+        }
     }
 }
 

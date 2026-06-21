@@ -466,7 +466,7 @@ const SPAWN_TOOLS = {
             const types = lane.types || null;
             if (types) {
                 const type = MONSTER_TYPE[types.chooseRandom()];
-                type.speed = lane.speed;
+                type.speed = lane.speed * ENGINE.INI.GRIDPIX;
                 type.w = ENGINE.INI.GRIDPIX;
                 type.h = ENGINE.INI.GRIDPIX;
                 console.log("...type", type);
