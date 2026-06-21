@@ -774,6 +774,8 @@ class Point extends MasterGridClass {
         super();
         this.x = Math.round(x);
         this.y = Math.round(y);
+        //this.x = Math.floor(x);
+        //this.y = Math.floor(y);
     }
     static toClass(point) {
         return new Point(point.x, point.y);

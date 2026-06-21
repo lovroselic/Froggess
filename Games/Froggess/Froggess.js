@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.5.4",
+    VERSION: "0.5.5",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",

@@ -3745,11 +3745,13 @@ class MoveState {
     linkGridArray(gridArray) {
         this.gridArray = gridArray;
     }
-    setEnd(repeat = 1) {
+    setEnd(repeat = 1, toOther = false) {
         if (this.dir !== null) {
             this.endGrid = this.startGrid.add(this.dir.prolong(repeat));
-            if (this.gridArray.outside(this.endGrid)) {
-                this.endGrid = this.gridArray.toOtherSide(this.endGrid);
+            if (toOther) {
+                if (this.gridArray.outside(this.endGrid)) {
+                    this.endGrid = this.gridArray.toOtherSide(this.endGrid);
+                }
             }
             this.moving = true;
         }

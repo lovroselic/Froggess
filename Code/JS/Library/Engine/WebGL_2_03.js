@@ -1498,6 +1498,11 @@ const WebGL = {
         gl.uniform1i(program.uniformLocations.uSampler, 0);
         gl.bindVertexArray(this.sprite_quad.vao);
 
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
         // draw non-player entities 
         for (const iam of WebGL.sprite2D_list) {
             for (const entity of iam.POOL) {
@@ -2907,14 +2912,37 @@ class $2D_Grid_Cycling_Entity_Part {
         if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
         this.draw = $2D_Entity.prototype.draw;
         this.dir = dir;
-        //ImportTypeToConstructor(this, type);
+        ImportTypeToConstructor(this, type);
     }
     update(lapsedTime) {
         if (this.moveState.moving) {
             GRID.translateMove2D(this, lapsedTime, null, false);
         } else {
+            this.checkPosition();
             this.moveState.next(this.dir);
         }
+    }
+    checkPosition() {
+        //console.log("this.moveState.startGrid.x", this.moveState.startGrid.x, this.moveState.endGrid.x, this.moveState.homeGrid.x, "this.dir.x", this.dir.x);
+        if (this.moveState.startGrid.x < 0 && this.dir.x < 0) {
+            this.moveToRight();
+        } else if (this.moveState.startGrid.x >= this.GA.width && this.dir.x > 0) {
+            this.moveToLeft();
+        }
+    }
+    moveToRight() {
+        this.moveState.startGrid.x = this.GA.width;
+        this.adjustPos();
+        //console.log("moveToRight");
+    }
+    moveToLeft() {
+        this.moveState.startGrid.x = -1; //-1
+        this.adjustPos();
+        //this.actor.pos.x = -24;
+        console.log("moveToLeft", this.actor.pos.x);
+    }
+    adjustPos() {
+        this.actor.pos = GRID.gridToCenterPX(this.moveState.startGrid);
     }
 }
 
