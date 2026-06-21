@@ -1376,8 +1376,21 @@ class ItemDropper3D extends IAM {
 /** 1d plane manager */
 
 class PlaneGridEntity1D extends IAM {
-    constructor() {
+    constructor(ia) {
         super();
+        this.IA = "enemyIA";
+    }
+    poolToIA(IA) {
+        for (const obj of this.POOL) {
+            IA.next(obj.moveState.startGrid, obj.id);
+            IA.next(obj.moveState.endGrid, obj.id);
+        }
+    }
+    manage(lapsedTime) {
+        let map = this.map;
+        map[this.IA] = new IndexArray(map.width, map.height, 4, 4);
+        this.update(lapsedTime);
+        this.poolToIA(map[this.IA]);
     }
 }
 
