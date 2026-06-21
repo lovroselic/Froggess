@@ -2905,6 +2905,7 @@ class $2D_player extends $2D_Entity {
     }
     carry(who) {
         const IA = this.map.enemyIA;
+        //cont
 
         //need IA
         console.error("carry who", who, "IA", IA);

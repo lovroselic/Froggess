@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.6.2",
+    VERSION: "0.6.3",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -191,9 +191,14 @@ const HERO = {
 
         //check survival ..
         if (who) {
-            HERO.carried = who;
-            HERO.checkForwardProgress();
-            return;
+            const which = PLANE_GRID1D.show(who);
+
+            if (which.category === "carrier") {
+                HERO.carried = who;
+                HERO.checkForwardProgress();
+                return;
+            }
+
         }
 
         //
