@@ -34,7 +34,7 @@ const INI = {
     //HERO_HEIGHT: 0.15,
     WINDOW_SCALE: 0.90,
     //TIMEOUT: 60,
-    TIMEOUT: 60000,
+    TIMEOUT: 600,
     MAX_ROW: 11,
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.6.1",
+    VERSION: "0.6.2",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -127,7 +127,7 @@ const HERO = {
     construct() {
         this.player = null;
         this.dead = false;
-        this.carried = false;
+        this.carried = 0;
         this.row = INI.MAX_ROW;
         this.to_fill = 5;
         //this.to_fill = 1; //
@@ -174,19 +174,26 @@ const HERO = {
         const map = MAP.main.map;
         const start_dir = map.startPosition.vector;
         const start_grid = Grid.toClass(map.startPosition.grid);
-        HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA);
+        HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA, map);
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
         console.log("HERO.player", HERO.player);
         if (GAME.time) GAME.time.unregister();
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
     handleHoleMove(grid) {
-        console.warn("handleHoleMove", grid);
+
+        const map = MAP.main.map;
+        const IA = map.enemyIA;
+        const who = IA.unroll(grid)[0] || null; //can be only one
+
+        console.warn("handleHoleMove", grid, "who", who);
+
 
         //check survival ..
-        if (false) {
-            HERO.carried = true;
+        if (who) {
+            HERO.carried = who;
             HERO.checkForwardProgress();
+            return;
         }
 
         //
@@ -195,7 +202,7 @@ const HERO = {
     },
     handleEmptyMove(grid) {
         console.warn("handleEmptyMove", grid);
-        HERO.carried = false;
+        HERO.carried = 0;
         HERO.checkForwardProgress();
     },
     handleReservedMove(grid) {

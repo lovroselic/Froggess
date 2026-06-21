@@ -1382,8 +1382,7 @@ class PlaneGridEntity1D extends IAM {
     }
     poolToIA(IA) {
         for (const obj of this.POOL) {
-            IA.next(obj.moveState.startGrid, obj.id);
-            IA.next(obj.moveState.endGrid, obj.id);
+            IA.next(obj.moveState.homeGrid, obj.id);
         }
     }
     manage(lapsedTime) {

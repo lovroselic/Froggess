@@ -1498,11 +1498,6 @@ const WebGL = {
         gl.uniform1i(program.uniformLocations.uSampler, 0);
         gl.bindVertexArray(this.sprite_quad.vao);
 
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
         // draw non-player entities 
         for (const iam of WebGL.sprite2D_list) {
             for (const entity of iam.POOL) {
@@ -2793,6 +2788,9 @@ class $2D_Sprite {
         if (this.spriteTexture) return this.spriteTexture;
         return this.asset.textures[this.frame];
     }
+    static copyPos(A, B) {
+        B.pos = A.pos;
+    }
 }
 
 
@@ -2824,12 +2822,15 @@ class $2D_Entity {
 }
 
 class $2D_player extends $2D_Entity {
-    constructor(grid, dir, type, GA, parent = HERO) {
+    constructor(grid, dir, type, GA, map, parent = HERO) {
         super(grid, dir, type, GA);
         this.parent = parent;
+        this.map = map;
+        this.IA = map.enemyIA;
     }
     move(dir) {
-        const nextGrid = this.moveState.startGrid.add(dir);
+        //const nextGrid = this.moveState.startGrid.add(dir);
+        const nextGrid = this.moveState.homeGrid.add(dir);
         if (this.GA.isOutOfBounds(nextGrid)) return;
         if (this.GA.isWall(nextGrid)) return;
 
@@ -2868,6 +2869,7 @@ class $2D_player extends $2D_Entity {
         }
     }
     continueMove(lapsedTime) {
+        if (this.parent.carried) this.carry(this.parent.carried);
         if (!this.moveState.moving) return;
         GRID.translateMove2D(this, lapsedTime, this.checkEndMove.bind(this), true);
     }
@@ -2900,6 +2902,12 @@ class $2D_player extends $2D_Entity {
     }
     addDeathTexture(img) {
         this.deathTexture = WebGL.createTexture(img);
+    }
+    carry(who) {
+        const IA = this.map.enemyIA;
+
+        //need IA
+        console.error("carry who", who, "IA", IA);
     }
 }
 

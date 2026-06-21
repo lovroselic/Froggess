@@ -3798,6 +3798,12 @@ class MoveState {
         this.pos = this.homeGrid;
         this.moving = false;
     }
+    static copy(A, B) {
+        B.startGrid = A.startGrid;
+        B.endGrid = A.endGrid;
+        B.homeGrid = A.homeGrid;
+        B.pos = A.pos;
+    }
 }
 class _2D_MoveState {
     constructor(pos, dir, parent) {
