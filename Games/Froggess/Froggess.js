@@ -22,7 +22,7 @@ const DEBUG = {
     SETTING: true,
     FPS: true,
     VERBOSE: true,
-    _2D_display: false,
+    _2D_display: true,
     INVINCIBLE: false,
     keys: false,
     max17: false,
@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.6.3",
+    VERSION: "0.7.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -181,13 +181,10 @@ const HERO = {
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
     handleHoleMove(grid) {
-
         const map = MAP.main.map;
         const IA = map.enemyIA;
         const who = IA.unroll(grid)[0] || null; //can be only one
-
         console.warn("handleHoleMove", grid, "who", who);
-
 
         //check survival ..
         if (who) {

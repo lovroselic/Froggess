@@ -3791,18 +3791,24 @@ class MoveState {
             return this.endGrid;
         }
     }
-    reset(grid) {
+    reset(grid, moving = false) {
         this.startGrid = Grid.toClass(grid);
         this.homeGrid = Grid.toClass(grid);
         this.endGrid = Grid.toClass(grid);
-        this.pos = this.homeGrid;
-        this.moving = false;
+        this.pos = FP_Grid.toClass(this.homeGrid);
+        this.moving = moving;
     }
-    static copy(A, B) {
-        B.startGrid = A.startGrid;
-        B.endGrid = A.endGrid;
-        B.homeGrid = A.homeGrid;
-        B.pos = A.pos;
+    copyFrom(other) {
+        this.startGrid = Grid.toClass(other.startGrid);
+        this.endGrid = Grid.toClass(other.endGrid);
+        this.homeGrid = Grid.toClass(other.homeGrid);
+        this.pos = FP_Grid.toClass(other.pos);
+    }
+    static copyTo(A, B) {
+        B.startGrid = Grid.toClass(A.startGrid);
+        B.endGrid = Grid.toClass(A.endGrid);
+        B.homeGrid = Grid.toClass(A.homeGrid);
+        B.pos = FP_Grid.toClass(A.pos);
     }
 }
 class _2D_MoveState {

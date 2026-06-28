@@ -654,7 +654,8 @@ Set.prototype.intersect = function (x) {
 
 /** Grids */
 class MasterGridClass {
-    constructor() { }
+    constructor() {
+    }
     EuclidianDistance(grid) {
         return Math.hypot(this.x - grid.x, this.y - grid.y);
     }
@@ -689,6 +690,9 @@ class Grid extends MasterGridClass {
     }
     static toCenter(grid) {
         return new FP_Grid(grid.x + 0.5, grid.y + 0.5);
+    }
+    static toRoundedClass(grid) {
+        return Grid.toClass(Grid.toCenter(grid));
     }
     add(vector, mul = 1) {
         return new Grid(this.x + vector.x * mul, this.y + vector.y * mul);
@@ -767,6 +771,12 @@ class FP_Grid extends MasterGridClass {
     sub(vector, factor = 1.0) {
         return this.add(vector, -factor);
     }
+    to_Grid() {
+        return new Grid(this.x, this.y);
+    }
+    toGrid() {
+        return this.to_Grid();
+    }
 }
 
 class Point extends MasterGridClass {
@@ -774,10 +784,6 @@ class Point extends MasterGridClass {
         super();
         this.x = x;
         this.y = y;
-        //this.x = Math.round(x);
-        //this.y = Math.round(y);
-        //this.x = Math.floor(x);
-        //this.y = Math.floor(y);
     }
     static toClass(point) {
         return new Point(point.x, point.y);
@@ -811,6 +817,13 @@ class Point extends MasterGridClass {
         let x = this.x / GS;
         let y = this.y / GS;
         return new FP_Grid(x, y);
+    }
+    to_Grid() {
+        return Grid.toClass(this.to_FP_Grid());
+    }
+    /** alias */
+    toGrid() {
+        return this.to_Grid();
     }
 }
 

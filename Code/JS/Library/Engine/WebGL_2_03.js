@@ -2788,11 +2788,7 @@ class $2D_Sprite {
         if (this.spriteTexture) return this.spriteTexture;
         return this.asset.textures[this.frame];
     }
-    static copyPos(A, B) {
-        B.pos = A.pos;
-    }
 }
-
 
 class $2D_Entity {
     constructor(grid, dir, type, GA) {
@@ -2812,6 +2808,7 @@ class $2D_Entity {
         gl.drawArrays(gl.TRIANGLES, 0, spriteQuad.count);
     }
     startMoving(dir) {
+        this.parent.carried = 0;
         this.sprite.rotationFromDir(dir);
         this.moveState.next(dir);
     }
@@ -2829,13 +2826,29 @@ class $2D_player extends $2D_Entity {
         this.IA = map.enemyIA;
     }
     move(dir) {
-        //const nextGrid = this.moveState.startGrid.add(dir);
-        const nextGrid = this.moveState.homeGrid.add(dir);
-        if (this.GA.isOutOfBounds(nextGrid)) return;
-        if (this.GA.isWall(nextGrid)) return;
+        let nextGrid = this.sprite.pos.to_FP_Grid();    //FP grid based on sprite center position
+
+        if (this.parent.carried) {
+            const which = PLANE_GRID1D.show(this.parent.carried);
+            const carrierDistance = which.speed / this.speed;   
+            const GRID_EPSILON = 0.001;
+
+            nextGrid = FP_Grid.toClass(nextGrid);                       //needs sub grid resolution
+            nextGrid = nextGrid.add(which.dir, carrierDistance);        //compensating carrier direction
+            nextGrid = nextGrid.add(which.dir, GRID_EPSILON);                 //compensating for rounding error
+            //nextGrid = nextGrid.add(dir, GRID_EPSILON);                 //compensating for rounding error
+
+            this.moveState.endGrid = Grid.toClass(nextGrid);
+            this.moveState.homeGrid = Grid.toClass(nextGrid);
+            this.moveState.startGrid = Grid.toClass(nextGrid);
+        }
+
+        let targetGrid = Grid.toClass(nextGrid).add(dir);
+
+        if (this.GA.isOutOfBounds(targetGrid)) return;
+        if (this.GA.isWall(targetGrid)) return;
 
         //allowed moves so far: EMPTY, HOLE
-        const nextValue = this.GA.getValue(nextGrid);
         this.startMoving(dir);
     }
     respond(lapsedTime) {
@@ -2904,11 +2917,13 @@ class $2D_player extends $2D_Entity {
         this.deathTexture = WebGL.createTexture(img);
     }
     carry(who) {
-        const IA = this.map.enemyIA;
-        //cont
+        //const IA = this.map.enemyIA;
+        const which = PLANE_GRID1D.show(who);
+        this.sprite.setPosition(which.sprite.pos);                                  //copy sprite position
 
-        //need IA
-        console.error("carry who", who, "IA", IA);
+        this.moveState.startGrid = Grid.toClass(which.moveState.startGrid);         //copy ms grid from carrier to hero
+        this.moveState.homeGrid = Grid.toClass(which.moveState.homeGrid);           //copy ms grid from carrier to hero
+        this.moveState.endGrid = Grid.toClass(which.moveState.endGrid);             //copy ms grid from carrier to hero
     }
 }
 

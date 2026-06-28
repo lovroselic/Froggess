@@ -53,7 +53,8 @@ const MAP = {
         6: {
             dir: -1,
             gap: 2,
-            speed: 1,
+            //speed: 0, //1
+            speed: 1, //1
             types: ["Turtle3"],
             start: 0,
 
@@ -62,6 +63,7 @@ const MAP = {
             dir: 1,
             gap: 2,
             speed: 1.15,
+            //speed: 0,
             types: ["Log3"],
             start: 1,
         },

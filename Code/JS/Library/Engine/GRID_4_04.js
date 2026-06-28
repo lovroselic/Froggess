@@ -284,7 +284,7 @@ const GRID = {
      * modern 2D version, used with openGl, 
      * sprite is used instead of actor, but actor used for legacy readability
      * VIEWPORT is handled elsewhere
-     * gridArray not used, assuming i will never again do a pacman clonse
+     * gridArray not used, assuming i will never again do a pacman clone
      */
     translateMove2D(entity, lapsedTime, onFinish = null, animate = true) {
         let length = (lapsedTime / 1000) * entity.speed;
