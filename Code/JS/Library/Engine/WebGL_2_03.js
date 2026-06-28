@@ -123,6 +123,9 @@ const WebGL = {
         PUSH_SPEED: 0.05,               // how much each push adds to sliding speed   
         CAMERA_SAFETY_RADIUS: 0.225,
         CAMERA_SAFETY_LERP_STEPS: 12,
+        VANISHING_WARNING_FACTOR: 0.2,
+        VANISHING_RESET: -1,
+        VANISHING_WARNING_ALPHA: 0.55,
     },
     setGridSize(size) {
         this.INI.GRID_SIZE = size;
@@ -1501,8 +1504,7 @@ const WebGL = {
         // draw non-player entities 
         for (const iam of WebGL.sprite2D_list) {
             for (const entity of iam.POOL) {
-                //if (entity.visible) entity.draw(gl, program, this.sprite_quad);
-                entity.draw(gl, program, this.sprite_quad);
+                if (entity.sprite.visible) entity.draw(gl, program, this.sprite_quad);
             }
         }
 
@@ -2830,13 +2832,12 @@ class $2D_player extends $2D_Entity {
 
         if (this.parent.carried) {
             const which = PLANE_GRID1D.show(this.parent.carried);
-            const carrierDistance = which.speed / this.speed;   
+            const carrierDistance = which.speed / this.speed;
             const GRID_EPSILON = 0.001;
 
             nextGrid = FP_Grid.toClass(nextGrid);                       //needs sub grid resolution
             nextGrid = nextGrid.add(which.dir, carrierDistance);        //compensating carrier direction
-            nextGrid = nextGrid.add(which.dir, GRID_EPSILON);                 //compensating for rounding error
-            //nextGrid = nextGrid.add(dir, GRID_EPSILON);                 //compensating for rounding error
+            nextGrid = nextGrid.add(which.dir, GRID_EPSILON);           //compensating for rounding error
 
             this.moveState.endGrid = Grid.toClass(nextGrid);
             this.moveState.homeGrid = Grid.toClass(nextGrid);
@@ -2845,7 +2846,7 @@ class $2D_player extends $2D_Entity {
 
         let targetGrid = Grid.toClass(nextGrid).add(dir);
 
-        if (this.GA.isOutOfBounds(targetGrid)) return;
+        if (this.GA.isOutOfBounds(targetGrid)) return this.parent.die();
         if (this.GA.isWall(targetGrid)) return;
 
         //allowed moves so far: EMPTY, HOLE
@@ -2917,13 +2918,15 @@ class $2D_player extends $2D_Entity {
         this.deathTexture = WebGL.createTexture(img);
     }
     carry(who) {
-        //const IA = this.map.enemyIA;
         const which = PLANE_GRID1D.show(who);
         this.sprite.setPosition(which.sprite.pos);                                  //copy sprite position
 
         this.moveState.startGrid = Grid.toClass(which.moveState.startGrid);         //copy ms grid from carrier to hero
         this.moveState.homeGrid = Grid.toClass(which.moveState.homeGrid);           //copy ms grid from carrier to hero
         this.moveState.endGrid = Grid.toClass(which.moveState.endGrid);             //copy ms grid from carrier to hero
+
+        if (this.GA.isOutOfBounds(this.moveState.homeGrid)) return this.parent.die();
+        if (!which.sprite.visible) return this.parent.die();
     }
 }
 
@@ -2937,13 +2940,30 @@ class $2D_Grid_Cycling_Entity_Part {
         this.draw = $2D_Entity.prototype.draw;
         this.dir = dir;
         ImportTypeToConstructor(this, type);
+        if (this.vanishTimer) this.vanishTimerSetting = this.vanishTimer;
     }
     update(lapsedTime) {
+
+        //moving
         if (this.moveState.moving) {
             GRID.translateMove2D(this, lapsedTime, null, false);
         } else {
             this.checkPosition();
             this.moveState.next(this.dir);
+        }
+
+        //vanishing
+        if (this.canVanish) {
+            this.vanishTimer -= lapsedTime / 1000;
+            if (this.vanishTimer / this.vanishTimerSetting <= WebGL.INI.VANISHING_WARNING_FACTOR && this.sprite.tint[3] === 1) {
+                this.sprite.tint = [1, 1, 1, WebGL.INI.VANISHING_WARNING_ALPHA];
+            } else if (this.vanishTimer <= 0 && this.vanishTimer > WebGL.INI.VANISHING_RESET) {
+                this.sprite.hide();
+            } else if (this.vanishTimer < WebGL.INI.VANISHING_RESET) {
+                this.sprite.tint = [1, 1, 1, 1];
+                this.sprite.show();
+                this.vanishTimer = this.vanishTimerSetting;
+            }
         }
     }
     checkPosition() {
