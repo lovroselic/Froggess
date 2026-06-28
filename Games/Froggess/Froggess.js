@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.7.0",
+    VERSION: "0.7.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -216,6 +216,8 @@ const HERO = {
         TITLE.score();
         HERO.player.sprite.hide();
         GAME.time.stop();
+        ENGINE.GAME.pauseBlock();
+        ENGINE.GAME.paused = true;
         ENGINE.GAME.ANIMATION.next(GAME.goalReachedRun);
     },
     checkForwardProgress() {
