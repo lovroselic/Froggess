@@ -465,13 +465,12 @@ const SPAWN_TOOLS = {
             console.log("..lane", laneIndex, lane);
             const types = lane.types || null;
             if (types) {
-                const type = MONSTER_TYPE[types.chooseRandom()];
-                type.speed = lane.speed * ENGINE.INI.GRIDPIX;
-                type.w = ENGINE.INI.GRIDPIX;
-                type.h = ENGINE.INI.GRIDPIX;
-                //type.gso = lane.gap + type.gridLength - (GA.width % (lane.gap + type.gridLength));
-                console.log("...type", type);
-                for (let x = lane.start; x < GA.width - type.gridLength; x += lane.gap + type.gridLength) {
+                for (let x = lane.start; x < GA.width - lane.gridLength; x += lane.gap + lane.gridLength) {
+                    const type = MONSTER_TYPE[types.chooseRandom()];
+                    type.speed = lane.speed * ENGINE.INI.GRIDPIX;
+                    type.w = ENGINE.INI.GRIDPIX;
+                    type.h = ENGINE.INI.GRIDPIX;
+                    console.log("...type", type);
                     const dir = new Vector(lane.dir, 0);
                     for (let off = 0; off < type.gridLength; off++) {
                         const grid = new Grid(x + off, GA.height - laneIndex - 1);

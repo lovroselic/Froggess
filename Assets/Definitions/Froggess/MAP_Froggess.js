@@ -17,31 +17,41 @@ const MAP = {
     ,
     1: {
         //first row, pavement
-        0: {
-            dir: -1,
-            gap: 10,
-            speed: 2,
-        },
+        0: {},
         //road lanes
         1: {
             dir: 1,
             gap: 4,
-            speed: 1,
+            speed: 2.0,
+            types: ["SUV", "PoliceCar", "FireTruck", "Ambulance"],
+            //types: ["Ambulance"],
+            start: 0,
+            gridLength: 2,
         },
         2: {
             dir: -1,
-            gap: 5,
-            speed: 1.2,
+            gap: 4,
+            speed: 2.0,
+            types: ["BronzeFormula", "GoldFormula", "RedFormula", "SilverFormula"],
+            start: 0,
+            gridLength: 2,
         },
         3: {
             dir: 1,
-            gap: 6,
-            speed: 1,
+            gap: 4,
+            speed: 1.5,
+            types: ["BlueCar", "GreenCar", "OrangeCar", "PurpleCar", "RedCar", "SilverCar", "YellowCar"],
+            start: 1,
+            gridLength: 1,
+
         },
         4: {
             dir: -1,
-            gap: 7,
-            speed: 1.35,
+            gap: 3,
+            speed: 1.0,
+            types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
+            start: 0,
+            gridLength: 3,
         },
         //mid row, pavement
         5: {
@@ -53,19 +63,18 @@ const MAP = {
         6: {
             dir: -1,
             gap: 2,
-            //speed: 0, //1
-            speed: 1, //1
+            speed: 1,
             types: ["Turtle3"],
             start: 0,
-
+            gridLength: 3,
         },
         7: {
             dir: 1,
             gap: 2,
             speed: 1.15,
-            //speed: 0,
             types: ["Log3"],
             start: 1,
+            gridLength: 3,
         },
         8: {
             dir: 1,
@@ -73,6 +82,7 @@ const MAP = {
             speed: 1.75,
             types: ["Log5"],
             start: 2,
+            gridLength: 5,
         },
         9: {
             dir: -1,
@@ -80,6 +90,7 @@ const MAP = {
             speed: 1.25,
             types: ["Turtle4"],
             start: 1,
+            gridLength: 4,
         },
         10: {
             dir: 1,
@@ -87,6 +98,7 @@ const MAP = {
             speed: 1.4,
             types: ["Log4"],
             start: 0,
+            gridLength: 4,
         }
     },
     2: {},

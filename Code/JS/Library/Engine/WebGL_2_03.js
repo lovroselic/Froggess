@@ -2818,6 +2818,10 @@ class $2D_Entity {
         if (!this.moveState.moving) return;
         GRID.translateMove2D(this, lapsedTime);
     }
+    setSpeed(speed) {
+        this.speed = speed;
+        this.sprite.speed = speed;
+    }
 }
 
 class $2D_player extends $2D_Entity {
