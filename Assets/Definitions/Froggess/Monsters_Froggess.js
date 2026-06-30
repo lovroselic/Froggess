@@ -20,6 +20,31 @@ const HERO_TYPE = {
 };
 
 const MONSTER_TYPE = {
+    FrogBonus: {
+        name: "FrogBonus",
+        category: "bonus",
+        asset: "Frog",
+        canVanish: false,
+        vanishTimer: 0,
+        animate: false,
+        dirRef: RIGHT,
+        score: 200,
+        w: 64,
+        h: 36,
+    },
+    Snake: {
+        name: "Snake",
+        category: "enemy",
+        asset: "Snake",
+        animate: true,
+        dirRef: RIGHT,
+        gridLength: 1,
+        canVanish: false,
+        vanishTimer: 0,
+        fps: 8,
+        w: 64,
+        h: 36,
+    },
     Log3: {
         name: "Log3",
         category: "carrier",
@@ -261,7 +286,7 @@ const MONSTER_TYPE = {
         animate: false,
         dirRef: LEFT,
     },
-     SilverTruck: {
+    SilverTruck: {
         name: "SilverTruck",
         category: "enemy",
         gridLength: 3,

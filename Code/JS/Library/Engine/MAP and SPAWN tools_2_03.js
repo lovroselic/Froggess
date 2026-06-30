@@ -464,21 +464,38 @@ const SPAWN_TOOLS = {
             const lane = map[laneIndex]
             console.log("..lane", laneIndex, lane);
             const types = lane.types || null;
+            const gridsUsed = [];
+            const dir = new Vector(lane.dir, 0);
+
             if (types) {
+                const speed = lane.speed * ENGINE.INI.GRIDPIX;;
                 for (let x = lane.start; x < GA.width - lane.gridLength; x += lane.gap + lane.gridLength) {
                     const type = MONSTER_TYPE[types.chooseRandom()];
-                    type.speed = lane.speed * ENGINE.INI.GRIDPIX;
+                    type.speed = speed;
                     type.w = ENGINE.INI.GRIDPIX;
                     type.h = ENGINE.INI.GRIDPIX;
                     console.log("...type", type);
-                    const dir = new Vector(lane.dir, 0);
+
+
                     for (let off = 0; off < type.gridLength; off++) {
                         const grid = new Grid(x + off, GA.height - laneIndex - 1);
-                        //console.log("....x", x, "grid", grid, "dir", dir);
-                        type.spriteTexture = ASSET[type.asset].textures[off] || ASSET[type.asset].textures[0];
+                        gridsUsed.push(grid);
+                        if (!type.animate) type.spriteTexture = ASSET[type.asset].textures[off] || ASSET[type.asset].textures[0];
                         const entity = new $2D_Grid_Cycling_Entity_Part(grid, dir, type, GA);
-                        //console.log(".....entity", entity);
+                        console.log(".....entity", entity);
                         PLANE_GRID1D.add(entity);
+                    }
+                }
+                const bonus = lane.bonus || null;
+                if (bonus) {
+                    console.warn("...bonus", bonus);
+                    for (let b = 0; b < bonus; b++) {
+                        const bGrid = gridsUsed.removeRandom();
+                        const bType = MONSTER_TYPE[lane.bonusTypes.chooseRandom()];
+                        bType.speed = speed;
+                        const bEntity = new $2D_Grid_Cycling_Entity_Part(bGrid, dir, bType, GA);
+                        console.log(".....bEntity", bEntity);
+                        PLANE_GRID1D.add(bEntity);
                     }
                 }
             }

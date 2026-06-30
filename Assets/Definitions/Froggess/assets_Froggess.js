@@ -16,7 +16,7 @@ LoadSheetSequences = [
     { srcName: "Log5.webp", count: 5, name: "Log5" },
     { srcName: "SnakeAnimation.png", count: 4, name: "Snake" },
     { srcName: "Turtle.webp", count: 1, name: "Turtle" },
-
+    { srcName: "Frog2.png", count: 1, name: "Frog" },
     { srcName: "Ambulance.png", count: 2, name: "Ambulance" },
     { srcName: "BlueCar.png", count: 1, name: "BlueCar" },
     { srcName: "BronzeFormula.png", count: 2, name: "BronzeFormula" },
@@ -47,20 +47,8 @@ LoadFonts = [
 ];
 
 LoadTextures = [
-    /** textures used by shaders */
-    //{ srcName: "Shading/Fire_color_map_512.webp", name: "Fire_color_map" },
-    //{ srcName: "Shading/fire_noise_512.webp", name: "Fire_noise" },
-
-    //title
     { srcName: "Title/Froggess_title_768.webp", name: "Title" },
     { srcName: "Title/FroggessBackground.webp", name: "FroggessBackground" },
-
-    //explosions
-    //{ srcName: "ObjectTextures/RedLiquid.jpg", name: "RedLiquid" },
-    //{ srcName: "ObjectTextures/SnowTexture.webp", name: "SnowTexture" },
-
-
-
 ];
 
 LoadAudio = [
@@ -70,15 +58,12 @@ LoadAudio = [
     { srcName: "death.mp3", name: "Death" },
     { srcName: "Splash.mp3", name: "Splash" },
     { srcName: "Level up.mp3", name: "LevelUp" },
+    { srcName: "Ribbit.mp3", name: "Ribbit" },
 ];
 
 LoadShaders = [
     'vShader2D_1_0.glsl', 'fShader2D_1_0.glsl',
 ];
-
-//LoadObjects = [  ];
-
-//LoadModels = [];
 
 LoadSprites = [
     //UI
@@ -89,7 +74,7 @@ LoadSprites = [
     { srcName: "Items/DeadFrog.png", name: "DeadFrog" },
     { srcName: "Items/BeastJaw.png", name: "BeastJaw" },
     { srcName: "Items/Fly2.png", name: "Fly2" },
-    { srcName: "Items/Frog2.png", name: "Frog2" },
+
 
 
 

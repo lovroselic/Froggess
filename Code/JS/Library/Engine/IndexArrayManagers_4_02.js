@@ -1382,7 +1382,7 @@ class PlaneGridEntity1D extends IAM {
     }
     poolToIA(IA) {
         for (const obj of this.POOL) {
-            IA.next(obj.moveState.homeGrid, obj.id);
+            if (obj) IA.next(obj.moveState.homeGrid, obj.id);
         }
     }
     manage(lapsedTime) {
@@ -1395,13 +1395,24 @@ class PlaneGridEntity1D extends IAM {
     checkPlayerCollision() {
         const grid = this.hero.player.moveState.homeGrid;
         const IA = this.map[this.IA];
-        const who = IA.unroll(grid)[0] || null;                     //can be only one
+        const who = IA.unroll(grid).find(element => {
+            const item = PLANE_GRID1D.show(element);
+            return item && item.category !== "carrier";
+        }) ?? null;
+
         if (who) {
             const which = PLANE_GRID1D.show(who);
-            const whichArea = which.sprite.getArea();
-            const heroArea = this.hero.player.sprite.getArea();
-            const hit = whichArea.overlap(heroArea);
-            if (hit && this.hero.die) return this.hero.die();       //else this does silenly nothing
+            if (["enemy", "bonus"].includes(which.category)) {
+                const whichArea = which.sprite.getArea();
+                const heroArea = this.hero.player.sprite.getArea();
+                const hit = whichArea.overlap(heroArea);
+                console.info("hit", which, who);
+                if (hit && which.category === "enemy" && this.hero.die) return this.hero.die();                     //else this does silenly nothing
+                if (hit && which.category === "bonus") {
+                    this.remove(who);
+                    if (this.hero.bonus) return this.hero.bonus(which.score);       //else this does silenly nothing 
+                }
+            }
         }
     }
 }

@@ -1504,7 +1504,7 @@ const WebGL = {
         // draw non-player entities 
         for (const iam of WebGL.sprite2D_list) {
             for (const entity of iam.POOL) {
-                if (entity.sprite.visible) entity.draw(gl, program, this.sprite_quad);
+                if (entity && entity.sprite.visible) entity.draw(gl, program, this.sprite_quad);
             }
         }
 
@@ -2894,7 +2894,7 @@ class $2D_player extends $2D_Entity {
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
         const grid = this.moveState.startGrid;
-        console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
+        //console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
         switch (endValue) {
             case MAPDICT.HOLE:
                 return this.handleHoleMove(grid);
@@ -2950,7 +2950,7 @@ class $2D_Grid_Cycling_Entity_Part {
 
         //moving
         if (this.moveState.moving) {
-            GRID.translateMove2D(this, lapsedTime, null, false);
+            GRID.translateMove2D(this, lapsedTime, null, true);
         } else {
             this.checkPosition();
             this.moveState.next(this.dir);

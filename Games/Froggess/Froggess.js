@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.7.4",
+    VERSION: "0.7.5",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -130,7 +130,12 @@ const HERO = {
         this.carried = 0;
         this.row = INI.MAX_ROW;
         this.to_fill = 5;
+        this.accumulatedBonus = 0;
         //this.to_fill = 1; //
+    },
+    bonus(score) {
+        this.accumulatedBonus += score;
+        AUDIO.Ribbit.play();
     },
     concludeAction() {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
@@ -176,7 +181,7 @@ const HERO = {
         const start_grid = Grid.toClass(map.startPosition.grid);
         HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA, map);
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
-        console.log("HERO.player", HERO.player);
+        //console.log("HERO.player", HERO.player);
         if (GAME.time) GAME.time.unregister();
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
@@ -205,14 +210,9 @@ const HERO = {
         return who;
     },
     handleEmptyMove(grid) {
-        //const who = HERO.getWho(grid);
-        console.warn("handleEmptyMove", grid);
+        //console.warn("handleEmptyMove", grid);
         HERO.carried = 0;
         HERO.checkForwardProgress();
-        /*if (who) {
-            const which = PLANE_GRID1D.show(who);
-            console.info(which.sprite.getArea(), HERO.player.sprite.getArea());
-        }*/
     },
     handleReservedMove(grid) {
         console.warn("handleReservedMove", grid);
@@ -220,6 +220,8 @@ const HERO = {
         GA.toWall(grid);
         ENGINE.drawToGrid("fill", grid, SPRITE.FroggessFilled);
         GAME.score += INI.SCORE_GOAL;
+        GAME.score += this.accumulatedBonus;
+        this.accumulatedBonus = 0;
         TITLE.score();
         HERO.player.sprite.hide();
         GAME.time.stop();

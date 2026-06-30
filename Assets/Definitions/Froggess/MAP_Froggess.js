@@ -48,15 +48,18 @@ const MAP = {
             dir: -1,
             gap: 3,
             speed: 1.0,
-            types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
+            //types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
             start: 0,
             gridLength: 3,
         },
         //mid row, pavement
         5: {
             dir: 1,
-            gap: 10,
-            speed: 2,
+            gap: 14,
+            speed: 1,
+            start: 0,
+            gridLength: 1,
+            //types: ["Snake"],
         },
         //water lanes
         6: {
@@ -74,6 +77,8 @@ const MAP = {
             types: ["Log3"],
             start: 1,
             gridLength: 3,
+            bonus: 1,
+            bonusTypes: ["FrogBonus"]
         },
         8: {
             dir: 1,
