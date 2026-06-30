@@ -1390,6 +1390,19 @@ class PlaneGridEntity1D extends IAM {
         map[this.IA] = new IndexArray(map.width, map.height, 4, 4);
         this.update(lapsedTime);
         this.poolToIA(map[this.IA]);
+        this.checkPlayerCollision();
+    }
+    checkPlayerCollision() {
+        const grid = this.hero.player.moveState.homeGrid;
+        const IA = this.map[this.IA];
+        const who = IA.unroll(grid)[0] || null;                     //can be only one
+        if (who) {
+            const which = PLANE_GRID1D.show(who);
+            const whichArea = which.sprite.getArea();
+            const heroArea = this.hero.player.sprite.getArea();
+            const hit = whichArea.overlap(heroArea);
+            if (hit && this.hero.die) return this.hero.die();       //else this does silenly nothing
+        }
     }
 }
 

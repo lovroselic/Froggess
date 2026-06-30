@@ -453,10 +453,10 @@ const ENGINE = {
         sprite.onload = ENGINE.creationSpriteCount;
         return sprite;
     },
-    ready() {
+    async ready() {
         console.log("%cENGINE ready!", ENGINE.CSS);
         $("#load").addClass("hidden");
-        ENGINE.readyCall.call();
+        if (ENGINE.readyCall) await ENGINE.readyCall.call();
         if (ENGINE.autostart) {
             if (ENGINE.start !== null) ENGINE.start();
         }
@@ -862,13 +862,46 @@ const ENGINE = {
         ENGINE.draw("temp", 0, 0, spriteSheet);
         return CTX;
     },
-    contextToSprite(newName, NTX) {
+    /*contextToSprite(newName, NTX) {
         SPRITE[newName] = new Image();
         SPRITE[newName].crossOrigin = "Anonymous";
         SPRITE[newName].src = NTX.canvas.toDataURL("image/png");
         SPRITE[newName].width = NTX.canvas.width;
         SPRITE[newName].height = NTX.canvas.height;
         return SPRITE[newName];
+    },*/
+    contextToSprite(newName, NTX) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+
+            img.onload = async () => {
+                try {
+                    if (img.decode) {
+                        await img.decode();
+                    }
+
+                    if (!img.complete || img.naturalWidth === 0 || img.naturalHeight === 0) {
+                        reject(new Error(`${newName}: generated sprite has no image data`));
+                        return;
+                    }
+
+                    img.width = NTX.canvas.width;
+                    img.height = NTX.canvas.height;
+
+                    SPRITE[newName] = img;
+                    resolve(img);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            img.onerror = () => {
+                reject(new Error(`${newName}: failed to create sprite from canvas`));
+            };
+
+            img.src = NTX.canvas.toDataURL("image/png");
+        });
     },
     packToSprite(obj) {
         var tags = ["left", "right", "front", "back"];
@@ -886,18 +919,27 @@ const ENGINE = {
             }
         }
     },
-    seqToSprite(obj) {
-        var CTX = ENGINE.drawSheet(obj.img);
-        let x;
-        let newName;
-        let names = [];
-        for (var q = 0; q < obj.count; q++) {
-            x = q * ENGINE.INI.SPRITESHEET_DEFAULT_WIDTH;
-            let NTX = ENGINE.extractImg(x, 0, CTX, obj.trim);
-            newName = obj.name + "_" + q.toString().padStart(2, "0");
-            ASSET[obj.name].linear.push(ENGINE.contextToSprite(newName, NTX));
+    async seqToSprite(obj) {
+        const CTX = ENGINE.drawSheet(obj.img);
+        const names = [];
+        const promises = [];
+
+        for (let q = 0; q < obj.count; q++) {
+            const x = q * ENGINE.INI.SPRITESHEET_DEFAULT_WIDTH;
+            const NTX = ENGINE.extractImg(x, 0, CTX, obj.trim);
+
+            const newName = obj.name + "_" + q.toString().padStart(2, "0");
             names.push(newName);
+
+            const promise = ENGINE.contextToSprite(newName, NTX).then((img) => {
+                ASSET[obj.name].linear[q] = img;
+            });
+
+            promises.push(promise);
         }
+
+        await Promise.all(promises);
+
         return names;
     },
     sheetToSprite(obj) {
@@ -1427,12 +1469,12 @@ const ENGINE = {
                 loadGLTF(),
             ];
 
-            await Promise.allSettled(allPromises);
+            await Promise.all(allPromises);
             console.log("%cAll assets loaded and ready!", ENGINE.CSS);
             console.log("%c****************************", ENGINE.CSS);
             console.groupEnd("preload");
             console.timeEnd("preloading");
-            ENGINE.ready();
+            await ENGINE.ready();
 
             function appendCanvas(name) {
                 let id = `preload_${name}`;
@@ -1567,21 +1609,35 @@ const ENGINE = {
 
             async function loadSheetSequences(arrPath = LoadSheetSequences) {
                 try {
-                    if (!arrPath) return true;
+                    if (!arrPath || !arrPath.length) return true;
+
                     console.log(`%c ...loading ${arrPath.length} sheet sequences`, ENGINE.CSS);
+
                     const toLoad = arrPath.map(({ name, srcName, count, trim }) => {
                         ASSET[name] = new LiveSPRITE("1D");
                         return { name, srcName, count, trim };
                     });
 
                     ENGINE.LOAD.HMSheetSequences = toLoad.length;
-                    if (ENGINE.LOAD.HMSheetSequences) appendCanvas("SheetSequences");
-                    const sequences = await Promise.all(toLoad.map((img) => loadImage(img, "SheetSequences", ENGINE.SHEET_SQUENCE_SOURCE)));
-                    sequences.forEach((el) => ENGINE.seqToSprite(el));
+
+                    if (ENGINE.LOAD.HMSheetSequences) {
+                        appendCanvas("SheetSequences");
+                    }
+
+                    const sequences = await Promise.all(
+                        toLoad.map((img) =>
+                            loadImage(img, "SheetSequences", ENGINE.SHEET_SQUENCE_SOURCE)
+                        )
+                    );
+
+                    await Promise.all(
+                        sequences.map((el) => ENGINE.seqToSprite(el))
+                    );
+
                     return true;
                 } catch (error) {
-                    console.error(`Failed to load sheet sequences: ${error}`);
-                    return false;
+                    console.error("Failed to load sheet sequences:", error);
+                    throw error;
                 }
             }
 
@@ -3252,7 +3308,7 @@ const ASSET = {
             }
         }
     },
-    convertToTextures() {
+    async convertToTextures() {
         for (const asset in ASSET) {
             const A = ASSET[asset];
             if (typeof A !== "object") continue;

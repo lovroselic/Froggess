@@ -42,7 +42,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.7.3",
+    VERSION: "0.7.4",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -181,9 +181,7 @@ const HERO = {
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
     handleHoleMove(grid) {
-        const map = MAP.main.map;
-        const IA = map.enemyIA;
-        const who = IA.unroll(grid)[0] || null; //can be only one
+        const who = HERO.getWho(grid);
         console.warn("handleHoleMove", grid, "who", who);
 
         //check survival ..
@@ -195,17 +193,26 @@ const HERO = {
                 HERO.checkForwardProgress();
                 return;
             }
-
         }
 
-        //
         AUDIO.Splash.play();
         HERO.die();
     },
+    getWho(grid) {
+        const map = MAP.main.map;
+        const IA = map.enemyIA;
+        const who = IA.unroll(grid)[0] || null; //can be only one
+        return who;
+    },
     handleEmptyMove(grid) {
+        //const who = HERO.getWho(grid);
         console.warn("handleEmptyMove", grid);
         HERO.carried = 0;
         HERO.checkForwardProgress();
+        /*if (who) {
+            const which = PLANE_GRID1D.show(who);
+            console.info(which.sprite.getArea(), HERO.player.sprite.getArea());
+        }*/
     },
     handleReservedMove(grid) {
         console.warn("handleReservedMove", grid);
