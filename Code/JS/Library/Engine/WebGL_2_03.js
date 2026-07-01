@@ -2832,7 +2832,7 @@ class $2D_player extends $2D_Entity {
         this.IA = map.enemyIA;
     }
     move(dir) {
-        let nextGrid = this.sprite.pos.to_FP_Grid();    //FP grid based on sprite center position
+        let nextGrid = this.sprite.pos.to_FP_Grid();                    //FP grid based on sprite center position
 
         if (this.parent.carried) {
             const which = PLANE_GRID1D.show(this.parent.carried);
@@ -2894,7 +2894,7 @@ class $2D_player extends $2D_Entity {
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
         const grid = this.moveState.startGrid;
-        console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
+
         switch (endValue) {
             case MAPDICT.HOLE:
                 return this.handleHoleMove(grid);
@@ -2946,6 +2946,7 @@ class $2D_Grid_Cycling_Entity_Part {
 
         this.canVanish = false;
         this.canBlink = false;
+        this.perish = false;
 
         ImportTypeToConstructor(this, type);
         if (this.vanishTimer) this.vanishTimerSetting = this.vanishTimer;
@@ -2978,10 +2979,15 @@ class $2D_Grid_Cycling_Entity_Part {
         //blinking
         if (this.canBlink) {
             this.blinkTimer -= lapsedTime / 1000;
-            if (this.blinkTimer <= 0) {
+            if (this.blinkTimer <= 0 && this.blinkTimer > -this.blinkTimerSetting) {
+                this.sprite.hide();
+            } else if (this.blinkTimer <= -this.blinkTimerSetting) {
                 const newGrid = this.useGrids.chooseRandom();
-                this.setGrid(newGrid);
-                this.blinkTimer = this.blinkTimerSetting;
+                if (this.GA.notWall(newGrid)) {
+                    this.setGrid(newGrid);
+                    this.blinkTimer = this.blinkTimerSetting;
+                    this.sprite.show();
+                }
             }
         }
     }

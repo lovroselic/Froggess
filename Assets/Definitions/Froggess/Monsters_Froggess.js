@@ -30,7 +30,7 @@ const MONSTER_TYPE = {
         dirRef: UP,
         animate: false,
         canBlink: true,
-        blinkTimer: 10, //10
+        blinkTimer: 10, 
         canVanish: false,
         vanishTimer: 0,
     },
@@ -43,7 +43,7 @@ const MONSTER_TYPE = {
         dirRef: UP,
         animate: false,
         canBlink: true,
-        blinkTimer: 6, //10
+        blinkTimer: 5, 
         canVanish: false,
         vanishTimer: 0,
     },
@@ -71,6 +71,7 @@ const MONSTER_TYPE = {
         fps: 8,
         w: 64,
         h: 36,
+        perish: true,
     },
     Log3: {
         name: "Log3",

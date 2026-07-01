@@ -4253,6 +4253,7 @@ class CountDown extends Timer {
         this.value = seconds;
         this.func = func;
         this.kwargs = kwargs || null;
+        this.active = true;
     }
     extend(value) {
         this.value += value;
@@ -4263,9 +4264,12 @@ class CountDown extends Timer {
     reset() {
         this.now = 0;
     }
+    deactivate() {
+        this.active = false;
+    }
     quit() {
         this.unregister();
-        this.func.call(this);
+        if (this.active) this.func.call(this);
     }
     remains() {
         return this.value - this.now;

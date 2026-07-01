@@ -212,6 +212,4 @@ const MAP = {
             enemyBlink: ["Beast"],
         }
     },
-    21: {},
-    31: {},
 };

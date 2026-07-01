@@ -1403,14 +1403,19 @@ class PlaneGridEntity1D extends IAM {
         if (who) {
             const which = PLANE_GRID1D.show(who);
             if (["enemy", "bonus"].includes(which.category)) {
-                const whichArea = which.sprite.getArea();
-                const heroArea = this.hero.player.sprite.getArea();
-                const hit = whichArea.overlap(heroArea);
-                console.info("hit", which, who);
-                if (hit && which.category === "enemy" && this.hero.die) return this.hero.die();                     //else this does silenly nothing
-                if (hit && which.category === "bonus") {
-                    this.remove(who);
-                    if (this.hero.bonus) return this.hero.bonus(which.score);       //else this does silenly nothing 
+                if (which.sprite.visible) {
+                    const whichArea = which.sprite.getArea();
+                    const heroArea = this.hero.player.sprite.getArea();
+                    const hit = whichArea.overlap(heroArea);
+
+                    if (hit && which.category === "enemy" && this.hero.die) {
+                        if (which.perish) this.remove(who);                             // to prevent insta death on continue level
+                        return this.hero.die();                                         //else this does silently nothing
+                    }
+                    if (hit && which.category === "bonus") {
+                        this.remove(who);
+                        if (this.hero.bonus) return this.hero.bonus(which.score);       //else this does silently nothing 
+                    }
                 }
             }
         }

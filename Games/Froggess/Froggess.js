@@ -39,11 +39,11 @@ const INI = {
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
     SCORE_PER_SECOND: 10,
-    MAX_LEVEL: 1,
+    MAX_LEVEL: 2,
 };
 
 const PRG = {
-    VERSION: "0.8.1",
+    VERSION: "0.8.2",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -133,7 +133,6 @@ const HERO = {
         this.row = INI.MAX_ROW;
         this.to_fill = 5;
         this.accumulatedBonus = 0;
-        //this.to_fill = 1; //
     },
     bonus(score) {
         this.accumulatedBonus += score;
@@ -143,12 +142,17 @@ const HERO = {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
     },
     die() {
-        console.red("HERO.die");
+        if (DEBUG.VERBOSE) {
+            console.red("HERO.die");
+            //console.trace();
+        }
+
         if (HERO.dead) return;
         HERO.dead = true;
+        HERO.accumulatedBonus = 0;
     },
     async death() {
-        console.red("HERO.death");
+        if (DEBUG.VERBOSE) console.red("HERO.death");
         ENGINE.GAME.ANIMATION.stop();
         GAME.lives--;
 
@@ -167,15 +171,10 @@ const HERO = {
         this.player.continueMove(lapsedTime);
     },
     completeLevel() {
-        console.ok("level completed");
+        if (DEBUG.VERBOSE) console.ok("level completed");
         AUDIO.LevelUp.play();
-        GAME.level++;
-        GAME.levelStart();
-    },
-    nextLevel() {
-        $("#FORM").remove();
         GAME.level = Math.min(INI.MAX_LEVEL, ++GAME.level);
-        GAME.start();
+        GAME.levelStart();
     },
     playerSetUp() {
         const map = MAP.main.map;
@@ -185,12 +184,11 @@ const HERO = {
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
         if (GAME.time) GAME.time.unregister();
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
+        if (DEBUG.VERBOSE) console.note("playerSetUp, HERO set to start grid");
     },
     handleHoleMove(grid) {
         const who = HERO.getWho(grid);
-        console.warn("handleHoleMove", grid, "who", who);
 
-        //check survival ..
         if (who) {
             const which = PLANE_GRID1D.show(who);
 
@@ -207,16 +205,14 @@ const HERO = {
     getWho(grid) {
         const map = MAP.main.map;
         const IA = map.enemyIA;
-        const who = IA.unroll(grid)[0] || null; //can be only one
+        const who = IA.unroll(grid)[0] || null;     //expected only one
         return who;
     },
     handleEmptyMove(grid) {
-        //console.warn("handleEmptyMove", grid);
         HERO.carried = 0;
         HERO.checkForwardProgress();
     },
     handleReservedMove(grid) {
-        console.warn("handleReservedMove", grid);
         const GA = this.player.GA;
         GA.toWall(grid);
         ENGINE.drawToGrid("fill", grid, SPRITE.FroggessFilled);
@@ -226,6 +222,7 @@ const HERO = {
         TITLE.score();
         HERO.player.sprite.hide();
         GAME.time.stop();
+        GAME.time.deactivate();
         ENGINE.GAME.pauseBlock();
         ENGINE.GAME.paused = true;
         ENGINE.GAME.ANIMATION.next(GAME.goalReachedRun);
@@ -290,6 +287,7 @@ const GAME = {
     continueLevel() {
         if (DEBUG.VERBOSE) console.log("Continue level", GAME.level);
         HERO.dead = false;
+        HERO.carried = 0;
         HERO.playerSetUp();
         GAME.setCameraView();
         GAME.setWorld();
@@ -451,8 +449,8 @@ const GAME = {
         const remains = GAME.time.remains();
         if (remains <= 0) {
             HERO.to_fill--;
-            HERO.playerSetUp();
             if (HERO.to_fill === 0) return HERO.completeLevel();
+            HERO.playerSetUp();
             ENGINE.GAME.ANIMATION.next(ENGINE.GAME.gameLoop);
         }
 
