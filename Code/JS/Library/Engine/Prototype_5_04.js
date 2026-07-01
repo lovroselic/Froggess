@@ -284,6 +284,9 @@ console.proto = function (
 console.title = (text) => console.proto(text, "#EEE", "bold", "18px");
 console.chapter = (text) => console.proto(text, "#AAA", "bold", "15px");
 console.ready = (text) => console.proto(`\n${text}\n\n`, "#38e538", "bold", "14px");
+console.red = (text) => console.proto(text, "#f50808", "bold");
+console.ok = (text) => console.proto(text, "#04ce3a", "bold");
+console.note = (text) => console.proto(text, "#ffffff", "italic");
 console.star = (color) => console.proto("**************************************************************************************************************************************", color);
 console.line = (color) => console.proto("--------------------------------------------------------------------------------------------------------------------------------------", color);
 

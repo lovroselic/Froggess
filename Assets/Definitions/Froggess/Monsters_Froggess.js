@@ -210,7 +210,7 @@ const MONSTER_TYPE = {
         canVanish: true,
         vanishTimer: 5,
         animate: false,
-        dirRef: RIGHT,
+        dirRef: LEFT,
     },
     Ambulance: {
         name: "Ambulance",

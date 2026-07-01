@@ -117,7 +117,11 @@ const MAP_TOOLS = {
         this.MAP[level].map.stopSpawning = this.MAP[level].stopSpawning || false;
 
         this.MAP[level].unpacked = true;
-        if (ENGINE.verbose) console.info("Unpacked MAP level", level, "map", this.MAP[level].map);
+        if (ENGINE.verbose) {
+            console.note(`Unpacked MAP level: ${level}`);
+            console.log("map:", this.MAP[level].map);
+        }
+
     },
     resetStorages() {
         for (const level in this.MAP) {
@@ -459,11 +463,11 @@ const SPAWN_TOOLS = {
     },
     spawnLanes(level, GA = MAP_TOOLS.MAP[level].map.GA) {
         const map = MAP_TOOLS.MAP[level];
-        console.log("spawning lanes for level", level, "map", map, "GA", GA, "GA.width", GA.width);
+        //console.log("spawning lanes for level", level, "map", map, "GA", GA, "GA.width", GA.width);
         const blinkGrids = [new Grid(1, 0), new Grid(4, 0), new Grid(7, 0), new Grid(10, 0), new Grid(13, 0)];
         for (const laneIndex in MAP_TOOLS.MAP[level]) {
             const lane = map[laneIndex]
-            console.log("..lane", laneIndex, lane);
+            //console.log("..lane", laneIndex, lane);
             const types = lane.types || null;
             const gridsUsed = [];
             const dir = new Vector(lane.dir, 0);
@@ -475,7 +479,7 @@ const SPAWN_TOOLS = {
                     type.speed = speed;
                     type.w = ENGINE.INI.GRIDPIX;
                     type.h = ENGINE.INI.GRIDPIX;
-                    console.log("...type", type);
+                    //console.log("...type", type);
 
 
                     for (let off = 0; off < type.gridLength; off++) {
@@ -483,19 +487,19 @@ const SPAWN_TOOLS = {
                         gridsUsed.push(grid);
                         if (!type.animate) type.spriteTexture = ASSET[type.asset].textures[off] || ASSET[type.asset].textures[0];
                         const entity = new $2D_Grid_Cycling_Entity_Part(grid, dir, type, GA);
-                        console.log(".....entity", entity);
+                        //console.log(".....entity", entity);
                         PLANE_GRID1D.add(entity);
                     }
                 }
                 const bonus = lane.bonus || null;
                 if (bonus) {
-                    console.warn("...bonus", bonus);
+                    //console.warn("...bonus", bonus);
                     for (let b = 0; b < bonus; b++) {
                         const bGrid = gridsUsed.removeRandom();
                         const bType = MONSTER_TYPE[lane.bonusTypes.chooseRandom()];
                         bType.speed = speed;
                         const bEntity = new $2D_Grid_Cycling_Entity_Part(bGrid, dir, bType, GA);
-                        console.log(".....bEntity", bEntity);
+                        //console.log(".....bEntity", bEntity);
                         PLANE_GRID1D.add(bEntity);
                     }
                 }
@@ -508,7 +512,7 @@ const SPAWN_TOOLS = {
                 bbType.useGrids = blinkGrids;
                 bbType.speed = 0;
                 const bbEntity = new $2D_Grid_Cycling_Entity_Part(bbGrid, NOWAY, bbType, GA);
-                console.log(".....bonusBlink Entity", bbEntity);
+                //console.log(".....bonusBlink Entity", bbEntity);
                 PLANE_GRID1D.add(bbEntity);
 
             } else if (lane.enemyBlink) {
@@ -517,7 +521,7 @@ const SPAWN_TOOLS = {
                 ebType.useGrids = blinkGrids;
                 ebType.speed = 0;
                 const ebEntity = new $2D_Grid_Cycling_Entity_Part(ebGrid, NOWAY, ebType, GA);
-                console.log(".....bonusBlink ENEMY", ebEntity);
+                //console.log(".....bonusBlink ENEMY", ebEntity);
                 PLANE_GRID1D.add(ebEntity);
             }
         }

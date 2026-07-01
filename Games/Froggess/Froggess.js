@@ -22,7 +22,7 @@ const DEBUG = {
     SETTING: true,
     FPS: true,
     VERBOSE: true,
-    _2D_display: true,
+    _2D_display: false,
     INVINCIBLE: false,
     keys: false,
     max17: false,
@@ -33,16 +33,17 @@ const INI = {
     HERO_HEALTH: 100,
     //HERO_HEIGHT: 0.15,
     WINDOW_SCALE: 0.90,
-    //TIMEOUT: 60,
-    TIMEOUT: 600,
+    TIMEOUT: 60,
+    //TIMEOUT: 600,
     MAX_ROW: 11,
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
     SCORE_PER_SECOND: 10,
+    MAX_LEVEL: 1,
 };
 
 const PRG = {
-    VERSION: "0.8.0",
+    VERSION: "0.8.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -135,7 +136,6 @@ const HERO = {
         //this.to_fill = 1; //
     },
     bonus(score) {
-        //console.warn("bonus added ", score);
         this.accumulatedBonus += score;
         AUDIO.Ribbit.play();
     },
@@ -143,12 +143,12 @@ const HERO = {
         if (!HERO.player.moveState.moving) HERO.player.sprite.reset();
     },
     die() {
-        console.error("HERO.die");
+        console.red("HERO.die");
         if (HERO.dead) return;
         HERO.dead = true;
     },
     async death() {
-        console.error("HERO.death");
+        console.red("HERO.death");
         ENGINE.GAME.ANIMATION.stop();
         GAME.lives--;
 
@@ -157,8 +157,8 @@ const HERO = {
         HERO.finalDeath();
     },
     finalDeath() {
-        console.error("HERO.finalDeath");
-        if (GAME.lives > 0) return GAME.levelStart();
+        console.red("HERO.finalDeath");
+        if (GAME.lives > 0) return GAME.continueLevel();
         GAME.checkScore();
         TITLE.hiscore();
         TITLE.startTitle();
@@ -167,7 +167,7 @@ const HERO = {
         this.player.continueMove(lapsedTime);
     },
     completeLevel() {
-        console.error("level completed");
+        console.ok("level completed");
         AUDIO.LevelUp.play();
         GAME.level++;
         GAME.levelStart();
@@ -183,7 +183,6 @@ const HERO = {
         const start_grid = Grid.toClass(map.startPosition.grid);
         HERO.player = new $2D_player(start_grid, start_dir, HERO_TYPE.Froggess, map.GA, map);
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
-        //console.log("HERO.player", HERO.player);
         if (GAME.time) GAME.time.unregister();
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
     },
@@ -267,8 +266,8 @@ const GAME = {
         ENGINE.GAME.setGameLoop(GAME.run);
         ENGINE.GAME.start(16);
         GAME.extraLife = SCORE.extraLife.clone();
-        GAME.level = 1;
-        GAME.lives = 3; //3
+        GAME.level = 2; //1
+        GAME.lives = 13; //3
         GAME.score = 0;
 
         GAME.fps = new FPS_short_term_measurement(300);
@@ -280,7 +279,7 @@ const GAME = {
         WebGL.INI.BACKGROUND_ALPHA = 0.0;
     },
     levelStart() {
-        console.log("starting level", GAME.level);
+        if (DEBUG.VERBOSE) console.log("Starting level", GAME.level);
         GAME.prepareForRestart();
         ENGINE.draw("background", 0, 0, TEXTURE.FroggessBackground);
         HERO.construct();
@@ -289,9 +288,15 @@ const GAME = {
         GAME.continueLevel();
     },
     continueLevel() {
+        if (DEBUG.VERBOSE) console.log("Continue level", GAME.level);
+        HERO.dead = false;
+        HERO.playerSetUp();
+        GAME.setCameraView();
+        GAME.setWorld();
         GAME.levelExecute();
     },
     levelExecute() {
+        if (DEBUG.VERBOSE) console.log("Execute level", GAME.level);
         GAME.drawFirstFrame(GAME.level);
         ENGINE.GAME.resume();
     },
@@ -303,15 +308,12 @@ const GAME = {
         if (DEBUG.VERBOSE) console.info("init level", level);
         this.newDungeon();
         this.buildWorld(level);
-        HERO.playerSetUp();
-        GAME.setCameraView();
-        GAME.setWorld();
     },
     setWorld() {
         WebGL.init2D('webgl');
     },
     buildWorld(level) {
-        if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level, "restart", GAME.restarted);
+        if (DEBUG.VERBOSE) console.info(" ******** building world, room/dungeon/level:", level);
         WebGL.init_required_IAM(MAP.main.map, HERO);
         SPAWN_TOOLS.spawnLanes(level, MAP.main.map.GA);
     },
@@ -366,7 +368,6 @@ const GAME = {
     run(lapsedTime) {
         if (ENGINE.GAME.stopAnimation) return;
         const date = Date.now();
-        //EXPLOSION3D.manage(date);
         GAME.respond(lapsedTime);
         ENGINE.TIMERS.update();
         HERO.manage(lapsedTime);
@@ -450,8 +451,8 @@ const GAME = {
         const remains = GAME.time.remains();
         if (remains <= 0) {
             HERO.to_fill--;
-            if (HERO.to_fill === 0) return HERO.completeLevel();
             HERO.playerSetUp();
+            if (HERO.to_fill === 0) return HERO.completeLevel();
             ENGINE.GAME.ANIMATION.next(ENGINE.GAME.gameLoop);
         }
 
