@@ -39,11 +39,11 @@ const INI = {
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
     SCORE_PER_SECOND: 10,
-    MAX_LEVEL: 3,
+    MAX_LEVEL: 4,
 };
 
 const PRG = {
-    VERSION: "0.8.3",
+    VERSION: "0.8.4",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -263,7 +263,7 @@ const GAME = {
         ENGINE.GAME.setGameLoop(GAME.run);
         ENGINE.GAME.start(16);
         GAME.extraLife = SCORE.extraLife.clone();
-        GAME.level = 3; //1
+        GAME.level = 4; //1
         GAME.lives = 3; //3
         GAME.score = 0;
 
