@@ -212,4 +212,108 @@ const MAP = {
             enemyBlink: ["Beast"],
         }
     },
+    3: {
+        //first row, pavement
+        0: {
+            dir: 1,
+            gap: 14,
+            speed: 1,
+            start: 0,
+            gridLength: 1,
+            types: ["Snake"],
+        },
+        //road lanes
+        1: {
+            dir: 1,
+            gap: 4,
+            speed: 1.6,
+            types: ["SUV", "PoliceCar", "FireTruck", "Ambulance"],
+            start: 0,
+            gridLength: 2,
+        },
+        2: {
+            dir: -1,
+            gap: 4,
+            speed: 1.7,
+            types: ["BronzeFormula", "GoldFormula", "RedFormula", "SilverFormula"],
+            start: 0,
+            gridLength: 2,
+        },
+        3: {
+            dir: 1,
+            gap: 4,
+            speed: 1.3,
+            types: ["BlueCar", "GreenCar", "OrangeCar", "PurpleCar", "RedCar", "SilverCar", "YellowCar"],
+            start: 1,
+            gridLength: 1,
+
+        },
+        4: {
+            dir: -1,
+            gap: 3,
+            speed: 1.2,
+            types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
+            start: 0,
+            gridLength: 3,
+        },
+        //mid row, pavement
+        5: {
+            dir: 1,
+            gap: 14,
+            speed: 1.3,
+            start: 3,
+            gridLength: 1,
+            types: ["Snake"],
+        },
+        //water lanes
+        6: {
+            dir: -1,
+            gap: 3,
+            speed: 1.1,
+            types: ["Turtle3"],
+            start: 0,
+            gridLength: 3,
+        },
+        7: {
+            dir: 1,
+            gap: 2,
+            speed: 1.2,
+            types: ["Log3"],
+            start: 1,
+            gridLength: 3,
+
+        },
+        8: {
+            dir: 1,
+            gap: 3,
+            speed: 1.8,
+            types: ["Log5"],
+            start: 2,
+            gridLength: 5,
+            bonus: 2,
+            bonusTypes: ["FrogBonus"]
+        },
+        9: {
+            dir: -1,
+            gap: 3,
+            speed: 1.4,
+            types: ["Turtle4"],
+            start: 1,
+            gridLength: 4,
+
+        },
+        10: {
+            dir: 1,
+            gap: 3,
+            speed: 1.4,
+            types: ["Log4"],
+            start: 0,
+            gridLength: 4,
+            
+        },
+        //finish lane
+        11: {
+            enemyBlink: ["Beast"],
+        }
+    },
 };
