@@ -23,7 +23,7 @@ const MAP = {
             dir: 1,
             gap: 4,
             speed: 1.5,
-            //types: ["SUV", "PoliceCar", "FireTruck", "Ambulance"],
+            types: ["SUV", "PoliceCar", "FireTruck", "Ambulance"],
             start: 0,
             gridLength: 2,
         },
@@ -31,7 +31,7 @@ const MAP = {
             dir: -1,
             gap: 4,
             speed: 1.6,
-            //types: ["BronzeFormula", "GoldFormula", "RedFormula", "SilverFormula"],
+            types: ["BronzeFormula", "GoldFormula", "RedFormula", "SilverFormula"],
             start: 0,
             gridLength: 2,
         },
@@ -39,7 +39,8 @@ const MAP = {
             dir: 1,
             gap: 4,
             speed: 1.25,
-            //types: ["BlueCar", "GreenCar", "OrangeCar", "PurpleCar", "RedCar", "SilverCar", "YellowCar"],
+            types: ["BlueCar", "GreenCar", "OrangeCar", "PurpleCar", "RedCar", "SilverCar", "YellowCar"],
+            //types: ["BlueCar"],
             start: 1,
             gridLength: 1,
 
@@ -48,7 +49,7 @@ const MAP = {
             dir: -1,
             gap: 3,
             speed: 1.0,
-            //types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
+            types: ["SilverTruck", "BrownTruck", "BronzeTruck"],
             start: 0,
             gridLength: 3,
         },
@@ -59,7 +60,7 @@ const MAP = {
             speed: 1,
             start: 0,
             gridLength: 1,
-            //types: ["Snake"],
+            types: ["Snake"],
         },
         //water lanes
         6: {
@@ -103,6 +104,11 @@ const MAP = {
             types: ["Log4"],
             start: 0,
             gridLength: 4,
+        },
+        //finish lane
+        11: {
+            //bonusBlink: ["FlyBonus"],
+            enemyBlink: ["Beast"],
         }
     },
     2: {},

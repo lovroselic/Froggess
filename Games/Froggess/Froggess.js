@@ -42,15 +42,16 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "0.7.5",
+    VERSION: "0.8.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
     CSS: "color: #239AFF;",
+    COLOR: "#239AFF",
     INIT() {
-        console.log("%c**************************************************************************************************************************************", PRG.CSS);
-        console.log(`${PRG.NAME} ${PRG.VERSION} by Lovro Selic, (c) LaughingSkull ${PRG.YEAR} on ${navigator.userAgent}`);
-        console.log("%c**************************************************************************************************************************************", PRG.CSS);
+        console.star(PRG.COLOR);
+        console.title(`${PRG.NAME} ${PRG.VERSION} by Lovro Selic, ${"\u00A9"} LaughingSkull ${PRG.YEAR} on ${navigator.userAgent}`);
+        console.star(PRG.COLOR);
         $("#title").html(PRG.NAME);
         $("#version").html(`${PRG.NAME} V${PRG.VERSION} <span style='font-size:14px'>&copy</span> LaughingSkull ${PRG.YEAR}`);
         $("input#toggleAbout").val("About " + PRG.NAME);
@@ -111,9 +112,9 @@ const PRG = {
         }
     },
     start() {
-        console.log("%c**************************************************************************************************************************************", PRG.CSS);
-        console.log(`${PRG.NAME} ${PRG.VERSION} STARTED!`);
-        console.log("%c**************************************************************************************************************************************", PRG.CSS);
+        console.star(PRG.COLOR);
+        console.chapter(`${PRG.NAME} ${PRG.VERSION} STARTED!`);
+        console.star(PRG.COLOR);
         $(ENGINE.topCanvas).off("mousemove", ENGINE.mouseOver);
         $(ENGINE.topCanvas).off("click", ENGINE.mouseClick);
         $(ENGINE.topCanvas).css("cursor", "");
@@ -134,6 +135,7 @@ const HERO = {
         //this.to_fill = 1; //
     },
     bonus(score) {
+        //console.warn("bonus added ", score);
         this.accumulatedBonus += score;
         AUDIO.Ribbit.play();
     },

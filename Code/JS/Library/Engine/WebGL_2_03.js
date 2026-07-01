@@ -2894,7 +2894,7 @@ class $2D_player extends $2D_Entity {
     checkEndMove() {
         const endValue = this.GA.getValue(this.moveState.startGrid);
         const grid = this.moveState.startGrid;
-        //console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
+        console.warn("checking end move, this.moveState.startGrid", grid, endValue, REVERSED_MAPDICT[endValue]);
         switch (endValue) {
             case MAPDICT.HOLE:
                 return this.handleHoleMove(grid);
@@ -2943,8 +2943,13 @@ class $2D_Grid_Cycling_Entity_Part {
         if (this.sprite.speed) this.speed = this.sprite.speed;  // legacy compatibility
         this.draw = $2D_Entity.prototype.draw;
         this.dir = dir;
+
+        this.canVanish = false;
+        this.canBlink = false;
+
         ImportTypeToConstructor(this, type);
         if (this.vanishTimer) this.vanishTimerSetting = this.vanishTimer;
+        if (this.blinkTimer) this.blinkTimerSetting = this.blinkTimer;
     }
     update(lapsedTime) {
 
@@ -2969,6 +2974,16 @@ class $2D_Grid_Cycling_Entity_Part {
                 this.vanishTimer = this.vanishTimerSetting;
             }
         }
+
+        //blinking
+        if (this.canBlink) {
+            this.blinkTimer -= lapsedTime / 1000;
+            if (this.blinkTimer <= 0) {
+                const newGrid = this.useGrids.chooseRandom();
+                this.setGrid(newGrid);
+                this.blinkTimer = this.blinkTimerSetting;
+            }
+        }
     }
     checkPosition() {
         if (this.moveState.startGrid.x < 0 && this.dir.x < 0) {
@@ -2987,6 +3002,10 @@ class $2D_Grid_Cycling_Entity_Part {
     }
     adjustPos() {
         this.actor.pos = GRID.gridToCenterPX(this.moveState.startGrid);
+    }
+    setGrid(grid) {
+        this.sprite.setGrid(grid);
+        this.moveState.reset(grid);
     }
 }
 

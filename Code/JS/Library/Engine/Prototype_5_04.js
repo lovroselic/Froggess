@@ -265,6 +265,28 @@ changelog:
     window.Classes = Classes;
 })();
 
+/** console prototypes */
+
+console.proto = function (
+    text,
+    color = "FFFFFF",
+    fontWeight = "normal",
+    fontSize = "inherit"
+) {
+    color = String(color).replace(/^#/, "");
+
+    console.log(
+        `%c${text}`,
+        `color: #${color}; font-weight: ${fontWeight}; font-size: ${fontSize};`
+    );
+};
+
+console.title = (text) => console.proto(text, "#EEE", "bold", "18px");
+console.chapter = (text) => console.proto(text, "#AAA", "bold", "15px");
+console.ready = (text) => console.proto(`\n${text}\n\n`, "#38e538", "bold", "14px");
+console.star = (color) => console.proto("**************************************************************************************************************************************", color);
+console.line = (color) => console.proto("--------------------------------------------------------------------------------------------------------------------------------------", color);
+
 /** Date prototypes */
 Date.prototype.addDays = function (days) {
     this.setDate(this.getDate() + days);

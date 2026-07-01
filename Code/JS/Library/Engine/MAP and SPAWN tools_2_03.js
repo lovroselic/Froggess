@@ -460,6 +460,7 @@ const SPAWN_TOOLS = {
     spawnLanes(level, GA = MAP_TOOLS.MAP[level].map.GA) {
         const map = MAP_TOOLS.MAP[level];
         console.log("spawning lanes for level", level, "map", map, "GA", GA, "GA.width", GA.width);
+        const blinkGrids = [new Grid(1, 0), new Grid(4, 0), new Grid(7, 0), new Grid(10, 0), new Grid(13, 0)];
         for (const laneIndex in MAP_TOOLS.MAP[level]) {
             const lane = map[laneIndex]
             console.log("..lane", laneIndex, lane);
@@ -498,6 +499,26 @@ const SPAWN_TOOLS = {
                         PLANE_GRID1D.add(bEntity);
                     }
                 }
+            }
+
+            //bonusBlink and enemyBlink are mutually exclusive!
+            if (lane.bonusBlink) {
+                let bbType = MONSTER_TYPE[lane.bonusBlink.chooseRandom()];
+                const bbGrid = blinkGrids.chooseRandom();
+                bbType.useGrids = blinkGrids;
+                bbType.speed = 0;
+                const bbEntity = new $2D_Grid_Cycling_Entity_Part(bbGrid, NOWAY, bbType, GA);
+                console.log(".....bonusBlink Entity", bbEntity);
+                PLANE_GRID1D.add(bbEntity);
+
+            } else if (lane.enemyBlink) {
+                let ebType = MONSTER_TYPE[lane.enemyBlink.chooseRandom()];
+                const ebGrid = blinkGrids.chooseRandom();
+                ebType.useGrids = blinkGrids;
+                ebType.speed = 0;
+                const ebEntity = new $2D_Grid_Cycling_Entity_Part(ebGrid, NOWAY, ebType, GA);
+                console.log(".....bonusBlink ENEMY", ebEntity);
+                PLANE_GRID1D.add(ebEntity);
             }
         }
         console.info(`Lanes for level ${level} spawned.`);

@@ -20,6 +20,33 @@ const HERO_TYPE = {
 };
 
 const MONSTER_TYPE = {
+    FlyBonus: {
+        name: "FlyBonus",
+        category: "bonus",
+        asset: "Fly",
+        score: 200,
+        w: 48,
+        h: 64,
+        dirRef: UP,
+        animate: false,
+        canBlink: true,
+        blinkTimer: 10, //10
+        canVanish: false,
+        vanishTimer: 0,
+    },
+    Beast: {
+        name: "Beast",
+        category: "enemy",
+        asset: "Beast",
+        w: 64,
+        h: 64,
+        dirRef: UP,
+        animate: false,
+        canBlink: true,
+        blinkTimer: 6, //10
+        canVanish: false,
+        vanishTimer: 0,
+    },
     FrogBonus: {
         name: "FrogBonus",
         category: "bonus",
@@ -29,8 +56,8 @@ const MONSTER_TYPE = {
         animate: false,
         dirRef: RIGHT,
         score: 200,
-        w: 64,
-        h: 36,
+        w: 48,
+        h: 48,
     },
     Snake: {
         name: "Snake",
@@ -90,7 +117,6 @@ const MONSTER_TYPE = {
         category: "carrier",
         gridLength: 3,
         asset: "Turtle",
-        //asset: "Log3",
         canVanish: true,
         vanishTimer: 10,
         animate: false,

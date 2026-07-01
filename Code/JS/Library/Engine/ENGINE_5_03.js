@@ -54,6 +54,7 @@ const ABOVE3 = new Vector3D(0, 0, 1);
 const ENGINE = {
     VERSION: "5.03",
     CSS: "color: #0FA",
+    COLOR: "#0FA",
     INI: {
         ANIMATION_INTERVAL: 16,
         SPRITESHEET_HEIGHT: 48,
@@ -454,7 +455,7 @@ const ENGINE = {
         return sprite;
     },
     async ready() {
-        console.log("%cENGINE ready!", ENGINE.CSS);
+        console.ready("ENGINE ready!");
         $("#load").addClass("hidden");
         if (ENGINE.readyCall) await ENGINE.readyCall.call();
         if (ENGINE.autostart) {
@@ -862,14 +863,6 @@ const ENGINE = {
         ENGINE.draw("temp", 0, 0, spriteSheet);
         return CTX;
     },
-    /*contextToSprite(newName, NTX) {
-        SPRITE[newName] = new Image();
-        SPRITE[newName].crossOrigin = "Anonymous";
-        SPRITE[newName].src = NTX.canvas.toDataURL("image/png");
-        SPRITE[newName].width = NTX.canvas.width;
-        SPRITE[newName].height = NTX.canvas.height;
-        return SPRITE[newName];
-    },*/
     contextToSprite(newName, NTX) {
         return new Promise((resolve, reject) => {
             const img = new Image();

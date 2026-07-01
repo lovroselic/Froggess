@@ -10,32 +10,34 @@
 /** END */
 
 LoadSheetSequences = [
-    { srcName: "Froggess.png", count: 6, name: "Froggess" },
-    { srcName: "Log3.webp", count: 3, name: "Log3" },
-    { srcName: "Log4.webp", count: 4, name: "Log4" },
-    { srcName: "Log5.webp", count: 5, name: "Log5" },
-    { srcName: "SnakeAnimation.png", count: 4, name: "Snake" },
-    { srcName: "Turtle.webp", count: 1, name: "Turtle" },
-    { srcName: "Frog2.png", count: 1, name: "Frog" },
-    { srcName: "Ambulance.png", count: 2, name: "Ambulance" },
-    { srcName: "BlueCar.png", count: 1, name: "BlueCar" },
-    { srcName: "BronzeFormula.png", count: 2, name: "BronzeFormula" },
-    { srcName: "BronzeTruck.png", count: 3, name: "BronzeTruck" },
-    { srcName: "BrownTruck.png", count: 3, name: "BrownTruck" },
-    { srcName: "Crocodile.png", count: 2, name: "Crocodile" },
-    { srcName: "FireTruck.png", count: 2, name: "FireTruck" },
-    { srcName: "GoldFormula.png", count: 2, name: "GoldFormula" },
-    { srcName: "GreenCar.png", count: 1, name: "GreenCar" },
-    { srcName: "OrangeCar.png", count: 1, name: "OrangeCar" },
-    { srcName: "PoliceCar.png", count: 2, name: "PoliceCar" },
-    { srcName: "PurpleCar.png", count: 1, name: "PurpleCar" },
-    { srcName: "RedCar.png", count: 1, name: "RedCar" },
-    { srcName: "RedFormula.png", count: 2, name: "RedFormula" },
-    { srcName: "SUV.png", count: 2, name: "SUV" },
-    { srcName: "SilverCar.png", count: 1, name: "SilverCar" },
-    { srcName: "SilverFormula.png", count: 2, name: "SilverFormula" },
-    { srcName: "SilverTruck.png", count: 3, name: "SilverTruck" },
-    { srcName: "YellowCar.png", count: 1, name: "YellowCar" },
+    { srcName: "Froggess.png", count: 6, name: "Froggess", trim: false },
+    { srcName: "Log3.webp", count: 3, name: "Log3", trim: false },
+    { srcName: "Log4.webp", count: 4, name: "Log4", trim: false },
+    { srcName: "Log5.webp", count: 5, name: "Log5", trim: false },
+    { srcName: "SnakeAnimation.png", count: 4, name: "Snake", trim: false },
+    { srcName: "Turtle.webp", count: 1, name: "Turtle", trim: false },
+    { srcName: "Frog2.png", count: 1, name: "Frog", trim: false },
+    { srcName: "Ambulance.png", count: 2, name: "Ambulance", trim: false },
+    { srcName: "BlueCar.png", count: 1, name: "BlueCar", trim: false },
+    { srcName: "BronzeFormula.png", count: 2, name: "BronzeFormula", trim: false },
+    { srcName: "BronzeTruck.png", count: 3, name: "BronzeTruck", trim: false },
+    { srcName: "BrownTruck.png", count: 3, name: "BrownTruck", trim: false },
+    { srcName: "Crocodile.png", count: 2, name: "Crocodile", trim: false },
+    { srcName: "FireTruck.png", count: 2, name: "FireTruck", trim: false },
+    { srcName: "GoldFormula.png", count: 2, name: "GoldFormula", trim: false },
+    { srcName: "GreenCar.png", count: 1, name: "GreenCar", trim: false },
+    { srcName: "OrangeCar.png", count: 1, name: "OrangeCar", trim: false },
+    { srcName: "PoliceCar.png", count: 2, name: "PoliceCar", trim: false },
+    { srcName: "PurpleCar.png", count: 1, name: "PurpleCar", trim: false },
+    { srcName: "RedCar.png", count: 1, name: "RedCar", trim: false },
+    { srcName: "RedFormula.png", count: 2, name: "RedFormula", trim: false },
+    { srcName: "SUV.png", count: 2, name: "SUV", trim: false },
+    { srcName: "SilverCar.png", count: 1, name: "SilverCar", trim: false },
+    { srcName: "SilverFormula.png", count: 2, name: "SilverFormula", trim: false },
+    { srcName: "SilverTruck.png", count: 3, name: "SilverTruck", trim: false },
+    { srcName: "YellowCar.png", count: 1, name: "YellowCar", trim: false },
+    { srcName: "BeastJaw.png", count: 1, name: "Beast", trim: false },
+    { srcName: "Fly2.png", count: 1, name: "Fly", trim: false },
 ];
 
 LoadFonts = [
@@ -72,11 +74,6 @@ LoadSprites = [
     //Items/sprites
     { srcName: "Items/FroggessFilled.png", name: "FroggessFilled" },
     { srcName: "Items/DeadFrog.png", name: "DeadFrog" },
-    { srcName: "Items/BeastJaw.png", name: "BeastJaw" },
-    { srcName: "Items/Fly2.png", name: "Fly2" },
-
-
-
 
 ];
 
