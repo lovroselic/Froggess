@@ -1,20 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <!-- bootstrap, css -->
-    <meta charset="UTF-8">
-    <link href="/CSS/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="/CSS/LaughingStyle.css" rel="stylesheet" type="text/css">
-
-    <!-- END -->
-
-    <title>Froggess</title>
-</head>
-
-<body>
-
-    <!-- copy start-->
+<!-- copy start-->
     <div id="preload" class="hidden"></div>
     <div class="container my-5 p-5 cool_page">
         <div id="setup">
@@ -171,26 +155,3 @@
         <div id="temp2" class="hidden"></div>
     </div>
     <!-- COPY END -->
-
-    <!-- External JS -->
-    <script src="/External/bootstrap.bundle.min.js"></script>
-    <script src="/External/jquery-3.6.0.min.js"></script>
-    <script src="/External/gl-matrix-min.js" type="text/javascript"></script>
-    <!-- JS -->
-    <script src="/Code/JS/Library/Engine/Prototype_5_04.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/LS_Matrix_1_05.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/ENGINE_5_03.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/GRID_4_04.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/MAZE_5_00.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/BWT_1_00.js" type="text/javascript"></script>
-    <script src='/Code/JS/Library/Engine/IndexArrayManagers_4_02.js'></script>
-    <script src="/Code/JS/Library/Engine/WebGL_2_03.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/Lights_and_materials_1_06.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/GenericTimers_1_03.js" type="text/javascript"></script>
-    <script src="/Assets/Definitions/Froggess/assets_Froggess.js" type="text/javascript"></script>
-    <script src="/Assets/Definitions/Froggess/MAP_Froggess.js" type="text/javascript"></script>
-    <script src="/Assets/Definitions/Froggess/Monsters_Froggess.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Engine/MAP and SPAWN tools_2_03.js" type="text/javascript"></script>
-    <script src="/Code/JS/Library/Misc/score_1_05.js" type="text/javascript"></script>
-    <script src="/Games/Froggess/Froggess.js" type="text/javascript"></script>
-</body>

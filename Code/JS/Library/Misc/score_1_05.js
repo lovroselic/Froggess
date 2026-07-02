@@ -1,6 +1,6 @@
 /////////////////////////////////////////score.js//////////////
 /*
-/  version 1.04 vy LS
+/  version 1.05 vy LS
 /  
 /   changelog:
 /   padLeft exchanged with ES6 padStart

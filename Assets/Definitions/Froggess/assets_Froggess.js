@@ -41,11 +41,9 @@ LoadSheetSequences = [
 ];
 
 LoadFonts = [
-
     { srcName: "C64_Pro-STYLE.ttf", name: "C64" },
     { srcName: "ArcadeClassic.ttf", name: "Arcade" },
     { srcName: "MoriaCitadel.ttf", name: "Moria" },
-
 ];
 
 LoadTextures = [
@@ -74,7 +72,6 @@ LoadSprites = [
     //Items/sprites
     { srcName: "Items/FroggessFilled.png", name: "FroggessFilled" },
     { srcName: "Items/DeadFrog.png", name: "DeadFrog" },
-
 ];
 
 console.log("%cAssets for Froggess ready.", "color: orange");

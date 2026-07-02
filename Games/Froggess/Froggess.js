@@ -21,7 +21,7 @@ retests:
 const DEBUG = {
     SETTING: true,
     FPS: true,
-    VERBOSE: true,
+    VERBOSE: false,
     _2D_display: false,
     INVINCIBLE: false,
     keys: false,
@@ -30,20 +30,17 @@ const DEBUG = {
 
 const INI = {
     SCREEN_BORDER: 64,
-    HERO_HEALTH: 100,
-    //HERO_HEIGHT: 0.15,
-    WINDOW_SCALE: 0.90,
     TIMEOUT: 60,
-    //TIMEOUT: 600,
+
     MAX_ROW: 11,
     SCORE_ROW: 10,
     SCORE_GOAL: 50,
     SCORE_PER_SECOND: 10,
-    MAX_LEVEL: 4,
+    MAX_LEVEL: 8,
 };
 
 const PRG = {
-    VERSION: "0.8.4",
+    VERSION: "1.0",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -245,7 +242,7 @@ const GAME = {
     timerRunning: false,
     levelComplete: false,
     start() {
-        console.log("GAME started");
+        if (DEBUG.VERBOSE) console.log("GAME started");
         if (AUDIO.Title) {
             AUDIO.Title.pause();
             AUDIO.Title.currentTime = 0;
@@ -263,7 +260,7 @@ const GAME = {
         ENGINE.GAME.setGameLoop(GAME.run);
         ENGINE.GAME.start(16);
         GAME.extraLife = SCORE.extraLife.clone();
-        GAME.level = 4; //1
+        GAME.level = 1; //1
         GAME.lives = 3; //3
         GAME.score = 0;
 
@@ -455,7 +452,7 @@ const GAME = {
             HERO.to_fill--;
             if (HERO.to_fill === 0) return HERO.completeLevel();
             HERO.playerSetUp();
-            ENGINE.GAME.ANIMATION.next(ENGINE.GAME.gameLoop);
+            ENGINE.GAME.resume();
         }
 
         GAME.goalReachedFrameDraw();
@@ -469,7 +466,7 @@ const GAME = {
 const TITLE = {
     startTitle() {
         if (DEBUG.VERBOSE) console.log("TITLE started");
-        //if (AUDIO.Title) AUDIO.Title.play(); //dev
+        if (AUDIO.Title) AUDIO.Title.play(); //dev
 
         ENGINE.GAME.pauseBlock();
         TITLE.clearAllLayers();
@@ -543,7 +540,7 @@ const TITLE = {
         grad.addColorStop(0.450, "#BDFFA1");
         grad.addColorStop(0.475, "#CFFF8E");
 
-        grad.addColorStop(0.500, "#DFFF7A"); // soft lime shine
+        grad.addColorStop(0.500, "#DFFF7A");
         grad.addColorStop(0.525, "#D5FB68");
         grad.addColorStop(0.550, "#C7F457");
         grad.addColorStop(0.575, "#B7EC49");

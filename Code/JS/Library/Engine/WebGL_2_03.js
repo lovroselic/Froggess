@@ -2953,6 +2953,9 @@ class $2D_Grid_Cycling_Entity_Part {
         if (this.blinkTimer) this.blinkTimerSetting = this.blinkTimer;
     }
     update(lapsedTime) {
+        const IA = this.parent.map.enemyIA;
+
+        lapsedTime = Math.max(lapsedTime, 17); //clamp, 16 produces split seams
 
         //moving
         if (this.moveState.moving) {
@@ -2983,7 +2986,8 @@ class $2D_Grid_Cycling_Entity_Part {
                 this.sprite.hide();
             } else if (this.blinkTimer <= -this.blinkTimerSetting) {
                 const newGrid = this.useGrids.chooseRandom();
-                if (this.GA.notWall(newGrid)) {
+                const who = IA.unroll(newGrid)[0] || null;
+                if (this.GA.notWall(newGrid) && !who) {
                     this.setGrid(newGrid);
                     this.blinkTimer = this.blinkTimerSetting;
                     this.sprite.show();
