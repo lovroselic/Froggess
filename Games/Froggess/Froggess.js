@@ -40,7 +40,7 @@ const INI = {
 };
 
 const PRG = {
-    VERSION: "1.0",
+    VERSION: "1.0.1",
     NAME: "Froggess",
     YEAR: "2026",
     SG: "Froggess",
@@ -147,6 +147,7 @@ const HERO = {
         if (HERO.dead) return;
         HERO.dead = true;
         HERO.accumulatedBonus = 0;
+        HERO.row = INI.MAX_ROW;
     },
     async death() {
         if (DEBUG.VERBOSE) console.red("HERO.death");
@@ -181,6 +182,7 @@ const HERO = {
         HERO.player.addDeathTexture(SPRITE.DeadFrog);
         if (GAME.time) GAME.time.unregister();
         GAME.time = new CountDown("LevelTime", INI.TIMEOUT, HERO.die);
+        HERO.row = INI.MAX_ROW;
         if (DEBUG.VERBOSE) console.note("playerSetUp, HERO set to start grid");
     },
     handleHoleMove(grid) {
